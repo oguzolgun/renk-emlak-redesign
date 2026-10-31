@@ -30,8 +30,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   display: flex; align-items: center; gap: 5%; background: rgba(255,255,255,.96);
   border-bottom: 1px solid rgba(232,229,235,.8); backdrop-filter: blur(16px);
 }
-.brand { border: 0; background: transparent; padding: 0; }
-.brand img { width: 134px; height: 64px; display: block; object-fit: contain; }
+.brand { border: 0; background: transparent; padding: 0; display: flex; align-items: center; }
+.brand img { height: 60px; width: auto; max-width: 170px; display: block; object-fit: contain; }
 .main-nav { display: flex; align-items: center; gap: 32px; flex: 1; }
 .main-nav button { border: 0; background: none; color: #46414d; font-size: 14px; font-weight: 600; padding: 30px 0; }
 .main-nav button:hover { color: var(--purple); }
@@ -48,7 +48,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .hero-scroll { height: 170vh; }
 .hero-sticky { position: sticky; top: 0; height: 100vh; min-height: 690px; overflow: hidden; background: #b7b4b7; }
-.hero-image { position: absolute; inset: 0; background: center 55%/cover no-repeat url('https://images.unsplash.com/photo-1657346088167-b982455bf29a?auto=format&fit=crop&w=2000&q=90'); }
+.hero-image { position: absolute; inset: 0; background: center 55%/cover no-repeat url('/hero-image.jpg'); }
 .hero-muted { filter: grayscale(1) contrast(.88); }
 .hero-color { transition: clip-path .08s linear; }
 .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(24,16,33,.82) 0%, rgba(35,24,44,.46) 43%, rgba(22,17,28,.08) 75%), linear-gradient(0deg, rgba(18,15,20,.35), transparent 40%); }
@@ -180,16 +180,68 @@ footer button { border: 0; background: none; color: rgba(255,255,255,.52); paddi
 .footer-contact span { color: rgba(255,255,255,.62); font-size: 11px; }
 footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1); margin-top: 20px; padding-top: 25px; color: rgba(255,255,255,.32); font-size: 9px; }
 
+.mobile-menu-toggle { display: none; }
+
 @media (max-width: 1100px) {
   .main-nav { display: none; }
   .header-actions { margin-left: auto; }
+  .mobile-menu-toggle {
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: var(--purple-dark);
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .mobile-dropdown-menu {
+    position: fixed;
+    top: 82px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 6%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+    z-index: 49;
+    animation: slideDown 0.2s ease;
+  }
+  .mobile-dropdown-menu button {
+    text-align: left;
+    background: none;
+    border: 0;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #46414d;
+  }
+  .mobile-dropdown-menu button:hover {
+    color: var(--purple);
+  }
+  .mobile-menu-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 4px 0;
+  }
+  .mobile-menu-login {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    color: var(--purple) !important;
+  }
   .listing-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .trust-band { grid-template-columns: 1fr 1fr; row-gap: 30px; }
   .detail-layout { grid-template-columns: 1fr 280px; gap: 28px; }
 }
 @media (max-width: 760px) {
   .site-header { height: 68px; padding: 0 4%; }
-  .brand img { width: 104px; height: 52px; }
+  .brand img { height: 44px; width: auto; max-width: 115px; }
+  .mobile-dropdown-menu { top: 68px; }
   .login-button span, .header-actions .icon-button { display: none; }
   .primary-button { padding: 10px 12px; }
   .hero-sticky { min-height: 600px; }
@@ -218,6 +270,10 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   .agent-card { position: static; }
   footer { grid-template-columns: 1fr 1fr; }
   .footer-brand, footer > small { grid-column: 1 / -1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; animation: none !important; transition: none !important; }

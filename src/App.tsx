@@ -21,8 +21,7 @@ const Icon = ({
     | 'arrow'
     | 'whatsapp'
     | 'close'
-    | 'calendar'
-    | 'filter'
+    | 'menu'
   size?: number
 }) => {
   const paths: Record<typeof name, ReactNode> = {
@@ -95,17 +94,7 @@ const Icon = ({
       <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
     ),
     close: <path d="M18 6 6 18M6 6l12 12" />,
-    calendar: (
-      <>
-        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-        <line x1="16" x2="16" y1="2" y2="6" />
-        <line x1="8" x2="8" y1="2" y2="6" />
-        <line x1="3" x2="21" y1="10" y2="10" />
-      </>
-    ),
-    filter: (
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-    ),
+    menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   }
   return (
     <svg
@@ -126,92 +115,103 @@ const Icon = ({
 
 function Header({
   onHome,
-  onFilterStatus,
+  onNavigate,
   onOpenConsultation,
-  savedCount,
+  onOpenLogin,
 }: {
   onHome: () => void
-  onFilterStatus: (status: 'Tümü' | 'Satılık' | 'Kiralık') => void
+  onNavigate: (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => void
   onOpenConsultation: () => void
-  savedCount: number
+  onOpenLogin: () => void
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   return (
     <header className="site-header">
       <button className="brand" onClick={onHome} aria-label="Renk Emlak ana sayfa">
         <img src="/renk-emlak-logo.png" alt="Renk Emlak" />
       </button>
+
       <nav className="main-nav" aria-label="Ana menü">
-        <button
-          onClick={() => {
-            onHome()
-            onFilterStatus('Satılık')
-          }}
-        >
-          Satılık
-        </button>
-        <button
-          onClick={() => {
-            onHome()
-            onFilterStatus('Kiralık')
-          }}
-        >
-          Kiralık
-        </button>
-        <button
-          onClick={() => {
-            onHome()
-            onFilterStatus('Tümü')
-          }}
-        >
-          Tüm Portföy ({listings.length})
-        </button>
-        <button
-          onClick={() => {
-            document.querySelector('#hakkimizda')?.scrollIntoView({ behavior: 'smooth' })
-          }}
-        >
-          Kurumsal
-        </button>
-        <button
-          onClick={() => {
-            document.querySelector('footer')?.scrollIntoView({ behavior: 'smooth' })
-          }}
-        >
-          İletişim
-        </button>
+        <button onClick={() => onNavigate('Satılık')}>Satılık</button>
+        <button onClick={() => onNavigate('Kiralık')}>Kiralık</button>
+        <button onClick={() => onNavigate('Projeler')}>Projeler</button>
+        <button onClick={() => onNavigate('Kurumsal')}>Kurumsal</button>
       </nav>
+
       <div className="header-actions">
-        <a
-          href="tel:03123521515"
-          className="login-button"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          title="Renk Emlak Çağrı Merkezi"
+        <button
+          className="icon-button"
+          aria-label="Favoriler"
+          onClick={() => {
+            onHome()
+            document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+          }}
         >
-          <Icon name="phone" size={17} />
-          <span>(0312) 352 15 15</span>
-        </a>
-        <button className="icon-button" aria-label="Favoriler" title={`${savedCount} Favori`}>
           <Icon name="heart" />
-          {savedCount > 0 && (
-            <span
-              style={{
-                marginLeft: '4px',
-                background: 'var(--red)',
-                color: 'white',
-                borderRadius: '999px',
-                fontSize: '11px',
-                padding: '2px 6px',
-                fontWeight: 700,
-              }}
-            >
-              {savedCount}
-            </span>
-          )}
+        </button>
+        <button className="login-button" onClick={onOpenLogin}>
+          <Icon name="user" />
+          <span>Giriş Yap</span>
         </button>
         <button className="primary-button" onClick={onOpenConsultation}>
           Ücretsiz İlan Ver
         </button>
+        <button
+          className="mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Menüyü aç/kapat"
+        >
+          <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={22} />
+        </button>
       </div>
+
+      {mobileMenuOpen && (
+        <div className="mobile-dropdown-menu">
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('Satılık')
+            }}
+          >
+            Satılık İlanlar
+          </button>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('Kiralık')
+            }}
+          >
+            Kiralık İlanlar
+          </button>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('Projeler')
+            }}
+          >
+            Projeler & Ticari
+          </button>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('Kurumsal')
+            }}
+          >
+            Kurumsal & İletişim
+          </button>
+          <div className="mobile-menu-divider" />
+          <button
+            className="mobile-menu-login"
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onOpenLogin()
+            }}
+          >
+            <Icon name="user" size={17} /> Giriş Yap
+          </button>
+        </div>
+      )}
     </header>
   )
 }
@@ -243,7 +243,7 @@ function Hero({ onExplore }: { onExplore: () => void }) {
         <div className="hero-shade" />
         <div className="hero-content">
           <p className="eyebrow">
-            <span /> ANKARA KEÇİÖREN & ETLİK BÖLGE UZMANI
+            <span /> Hayalinizdeki yaşam burada başlar
           </p>
           <h1>
             Evinizi
@@ -251,16 +251,16 @@ function Hero({ onExplore }: { onExplore: () => void }) {
             <em>renklendiriyoruz.</em>
           </h1>
           <p className="hero-copy">
-            Aşağı Eğlence, Etlik ve Keçiören bölgesinde 35 yılı aşkın tecrübeyle;
+            Doğru evi bulmak bir aramadan fazlası.
             <br />
-            güvenilir, doğrulanmış ve şeffaf gayrimenkul danışmanlığı.
+            Size iyi hissettirecek yaşamı birlikte keşfedelim.
           </p>
           <button className="hero-cta" onClick={onExplore}>
-            Güncel İlanları Keşfet ({listings.length}) <Icon name="arrow" />
+            İlanları keşfet <Icon name="arrow" />
           </button>
         </div>
         <div className="color-meter">
-          <span>GÜVEN</span>
+          <span>SADELİK</span>
           <div>
             <i style={{ height: `${Math.max(8, progress * 100)}%` }} />
           </div>
@@ -277,20 +277,6 @@ function Hero({ onExplore }: { onExplore: () => void }) {
   )
 }
 
-type FilterProps = {
-  status: 'Tümü' | 'Satılık' | 'Kiralık'
-  setStatus: (s: 'Tümü' | 'Satılık' | 'Kiralık') => void
-  query: string
-  setQuery: (q: string) => void
-  propertyType: string
-  setPropertyType: (t: string) => void
-  room: string
-  setRoom: (r: string) => void
-  matchCount: number
-  onReset: () => void
-  compact?: boolean
-}
-
 function FilterPanel({
   status,
   setStatus,
@@ -303,7 +289,19 @@ function FilterPanel({
   matchCount,
   onReset,
   compact = false,
-}: FilterProps) {
+}: {
+  status: 'Satılık' | 'Kiralık' | 'Proje'
+  setStatus: (s: 'Satılık' | 'Kiralık' | 'Proje') => void
+  query: string
+  setQuery: (q: string) => void
+  propertyType: string
+  setPropertyType: (t: string) => void
+  room: string
+  setRoom: (r: string) => void
+  matchCount: number
+  onReset: () => void
+  compact?: boolean
+}) {
   return (
     <aside className={`filter-panel ${compact ? 'compact' : ''}`}>
       <div className="filter-heading">
@@ -315,7 +313,7 @@ function FilterPanel({
       </div>
 
       <div className="segment">
-        {(['Tümü', 'Satılık', 'Kiralık'] as const).map((item) => (
+        {(['Satılık', 'Kiralık', 'Proje'] as const).map((item) => (
           <button
             key={item}
             className={status === item ? 'active' : ''}
@@ -327,11 +325,11 @@ function FilterPanel({
       </div>
 
       <label className="field">
-        <span>Konum veya Başlık</span>
+        <span>Konum</span>
         <div>
           <Icon name="pin" size={18} />
           <input
-            placeholder="Aşağı Eğlence, Etlik, Meşeli, Cadde..."
+            placeholder="İl, ilçe veya mahalle"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -348,7 +346,7 @@ function FilterPanel({
             marginTop: '6px',
           }}
         >
-          {['Tümü', 'Daire', 'Dükkan'].map((t) => (
+          {['Tümü', 'Konut', 'İş Yeri'].map((t) => (
             <button
               key={t}
               onClick={() => setPropertyType(t)}
@@ -372,7 +370,7 @@ function FilterPanel({
       <div className="field">
         <span>Oda sayısı</span>
         <div className="room-options">
-          {['Hepsi', '1+1', '2+1', '3+1'].map((rm) => (
+          {['1+1', '2+1', '3+1', '4+'].map((rm) => (
             <button
               key={rm}
               style={{
@@ -381,7 +379,7 @@ function FilterPanel({
                 fontWeight: room === rm ? 700 : undefined,
                 backgroundColor: room === rm ? 'var(--purple-soft)' : undefined,
               }}
-              onClick={() => setRoom(rm)}
+              onClick={() => setRoom(room === rm ? '' : rm)}
             >
               {rm}
             </button>
@@ -398,7 +396,7 @@ function FilterPanel({
         <Icon name="search" /> {matchCount} ilanı göster
       </button>
 
-      {(query || status !== 'Tümü' || propertyType !== 'Tümü' || room !== 'Hepsi') && (
+      {(query || propertyType !== 'Tümü' || room !== '') && (
         <button
           onClick={onReset}
           className="advanced-button"
@@ -430,28 +428,11 @@ function ListingCard({
           alt={listing.title}
           loading="lazy"
           onError={(e) => {
-            // fallback if local path fails
             e.currentTarget.src =
               'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=85'
           }}
         />
         {listing.featured && <span className="featured-badge">ÖNE ÇIKAN</span>}
-        <span
-          style={{
-            position: 'absolute',
-            bottom: '12px',
-            left: '12px',
-            backgroundColor: 'rgba(23, 21, 29, 0.82)',
-            color: 'white',
-            fontSize: '11px',
-            fontWeight: 700,
-            padding: '3px 8px',
-            borderRadius: '6px',
-            backdropFilter: 'blur(4px)',
-          }}
-        >
-          {listing.type}
-        </span>
         <button
           className={`save-button ${isSaved ? 'saved' : ''}`}
           onClick={(event) => {
@@ -506,41 +487,36 @@ function HomePage({
   onToggleSave,
 }: {
   onOpen: (listing: Listing) => void
-  filterStatus: 'Tümü' | 'Satılık' | 'Kiralık'
-  setFilterStatus: (s: 'Tümü' | 'Satılık' | 'Kiralık') => void
+  filterStatus: 'Satılık' | 'Kiralık' | 'Proje'
+  setFilterStatus: (s: 'Satılık' | 'Kiralık' | 'Proje') => void
   savedIds: Set<number>
   onToggleSave: (id: number) => void
 }) {
   const [sort, setSort] = useState('Önerilen sıralama')
   const [query, setQuery] = useState('')
   const [propertyType, setPropertyType] = useState('Tümü')
-  const [room, setRoom] = useState('Hepsi')
+  const [room, setRoom] = useState('')
   const [visibleCount, setVisibleCount] = useState(9)
 
   const handleReset = () => {
-    setFilterStatus('Tümü')
     setQuery('')
     setPropertyType('Tümü')
-    setRoom('Hepsi')
+    setRoom('')
   }
 
-  // Filter listings
   const filteredListings = useMemo(() => {
     return listings.filter((item) => {
-      // Status filter
       if (filterStatus === 'Satılık' && !item.type.includes('Satılık')) return false
       if (filterStatus === 'Kiralık' && !item.type.includes('Kiralık')) return false
-
-      // Property type filter
-      if (propertyType === 'Daire' && !item.type.includes('Daire') && !item.title.includes('Daire'))
-        return false
-      if (propertyType === 'Dükkan' && !item.type.includes('Dükkan') && !item.title.includes('Dükkan'))
+      if (filterStatus === 'Proje' && !item.type.includes('Bina') && !item.type.includes('Dükkan'))
         return false
 
-      // Room filter
-      if (room !== 'Hepsi' && item.room !== room) return false
+      if (propertyType === 'Konut' && !item.type.includes('Daire')) return false
+      if (propertyType === 'İş Yeri' && !item.type.includes('Dükkan') && !item.type.includes('Bina'))
+        return false
 
-      // Search query filter
+      if (room && item.room !== room) return false
+
       if (query.trim()) {
         const q = query.toLowerCase().trim()
         const target = `${item.title} ${item.location} ${item.description} ${item.type}`.toLowerCase()
@@ -551,7 +527,6 @@ function HomePage({
     })
   }, [filterStatus, propertyType, room, query])
 
-  // Sort listings
   const sortedListings = useMemo(() => {
     const list = [...filteredListings]
     if (sort === 'Fiyata göre artan') {
@@ -561,20 +536,9 @@ function HomePage({
         return pA - pB
       })
     }
-    if (sort === 'Fiyata göre azalan') {
-      return list.sort((a, b) => {
-        const pA = parseInt(a.price.replace(/[^\d]/g, '')) || 0
-        const pB = parseInt(b.price.replace(/[^\d]/g, '')) || 0
-        return pB - pA
-      })
-    }
-    if (sort === 'Alana göre (m²)') {
-      return list.sort((a, b) => b.area - a.area)
-    }
     if (sort === 'En yeniler') {
       return list.sort((a, b) => b.id - a.id)
     }
-    // Default: featured first, then original order
     return list.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
   }, [filteredListings, sort])
 
@@ -591,12 +555,9 @@ function HomePage({
       <main id="listings" className="listing-section">
         <div className="listing-intro">
           <div>
-            <span className="section-kicker">RENK EMLAK GÜNCEL PORTFÖY</span>
-            <h2>Yeni bir yaşama açılan kapılar</h2>
-            <p>
-              Ankara Keçiören ve Etlik bölgesinde uzman danışmanlarımız tarafından yerinde
-              incelenmiş canlı portföy.
-            </p>
+            <span className="section-kicker">SEÇKİN PORTFÖY</span>
+            <h2>Yeni bir hayata açılan kapılar</h2>
+            <p>Uzmanlarımız tarafından doğrulanmış, size özel seçilen ilanlar.</p>
           </div>
           <div className="market-note">
             <span>Canlı Portföy</span>
@@ -621,8 +582,7 @@ function HomePage({
           <div className="results">
             <div className="results-toolbar">
               <p>
-                <strong>Ankara (Keçiören / Etlik)</strong> genelinde{' '}
-                <b>{filteredListings.length}</b> ilan listeleniyor
+                <strong>Ankara</strong> ve çevresinde <b>{filteredListings.length}</b> ilan
               </p>
               <select
                 value={sort}
@@ -631,8 +591,6 @@ function HomePage({
               >
                 <option>Önerilen sıralama</option>
                 <option>Fiyata göre artan</option>
-                <option>Fiyata göre azalan</option>
-                <option>Alana göre (m²)</option>
                 <option>En yeniler</option>
               </select>
             </div>
@@ -649,7 +607,7 @@ function HomePage({
               >
                 <h3>Aradığınız kriterlere uygun ilan bulunamadı</h3>
                 <p style={{ color: 'var(--muted)', marginTop: '8px' }}>
-                  Farklı bir arama terimi deneyebilir veya filtreleri temizleyebilirsiniz.
+                  Filtreleri temizleyerek tüm portföyü görüntüleyebilirsiniz.
                 </p>
                 <button
                   onClick={handleReset}
@@ -678,15 +636,14 @@ function HomePage({
                 className="load-more"
                 onClick={() => setVisibleCount((prev) => prev + 9)}
               >
-                Daha fazla ilan göster (+
-                {Math.min(9, sortedListings.length - visibleCount)}) <Icon name="arrow" />
+                Daha fazla ilan göster <Icon name="arrow" />
               </button>
             )}
           </div>
         </div>
       </main>
 
-      <section id="hakkimizda" className="trust-band">
+      <section id="kurumsal" className="trust-band">
         <div>
           <span className="section-kicker light">RENK EMLAK FARKI</span>
           <h2>
@@ -698,18 +655,18 @@ function HomePage({
         {[
           [
             '01',
-            'Doğrulanmış İlanlar',
-            'Her portföy Renk Emlak uzman ekibimiz tarafından bizzat yerinde görülür, tapu ve yapı bilgileri incelenir.',
+            'Doğrulanmış ilanlar',
+            'Her portföy uzman ekibimiz tarafından yerinde kontrol edilir.',
           ],
           [
             '02',
-            'Keçiören & Etlik Uzmanlığı',
-            'Aşağı Eğlence, Etlik, Meşeli ve Pınarbaşı mahallelerinde 35 yılı aşkın süredir en doğru fiyat ekspertizini sunuyoruz.',
+            'Bölge uzmanlığı',
+            'Mahalle mahalle güncel fiyat ve yaşam bilgisi sunarız.',
           ],
           [
             '03',
-            'Şeffaf ve Uçtan Uca Destek',
-            'İlan sunumundan pazarlığa, banka kredisinden tapu devrine kadar tüm adımlarda yanınızdayız.',
+            'Uçtan uca destek',
+            'İlk geziden tapu sürecine kadar her adımda yanınızdayız.',
           ],
         ].map(([no, title, text]) => (
           <article key={no}>
@@ -738,7 +695,7 @@ function DetailPage({
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const whatsappMessage = encodeURIComponent(
-    `Merhaba Mesut Bey, renkemlak.com üzerinden "RNK-${listing.id} / ${listing.title}" ilanınızla ilgileniyorum. Detaylı bilgi alabilir miyim?`
+    `Merhaba Mesut Bey, renkemlak.com üzerinden "RNK-${listing.id} / ${listing.title}" ilanınız hakkında bilgi alabilir miyim?`
   )
 
   return (
@@ -764,13 +721,10 @@ function DetailPage({
           <button
             onClick={() => {
               if (navigator.share) {
-                navigator.share({
-                  title: listing.title,
-                  url: window.location.href,
-                })
+                navigator.share({ title: listing.title, url: window.location.href })
               } else {
                 navigator.clipboard.writeText(window.location.href)
-                alert('İlan bağlantısı panoya kopyalandı!')
+                alert('İlan bağlantısı kopyalandı!')
               }
             }}
           >
@@ -778,9 +732,7 @@ function DetailPage({
           </button>
           <button
             onClick={() => onToggleSave(listing.id)}
-            style={{
-              color: isSaved ? 'var(--red)' : undefined,
-            }}
+            style={{ color: isSaved ? 'var(--red)' : undefined }}
           >
             <Icon name="heart" /> {isSaved ? 'Kaydedildi' : 'Kaydet'}
           </button>
@@ -825,7 +777,6 @@ function DetailPage({
           </div>
         </div>
 
-        {/* Thumbnail Selector */}
         {images.length > 1 && (
           <div
             style={{
@@ -853,7 +804,6 @@ function DetailPage({
                   padding: 0,
                   cursor: 'pointer',
                   opacity: activeImageIndex === idx ? 1 : 0.7,
-                  transition: 'opacity .2s, border .2s',
                 }}
               >
                 <img
@@ -871,27 +821,27 @@ function DetailPage({
         <div className="detail-content">
           <section className="detail-summary">
             <div>
-              <small>İlan Fiyatı</small>
+              <small>İlan fiyatı</small>
               <strong>{listing.price}</strong>
             </div>
             <div>
               <Icon name="bed" />
               <span>
-                <small>Oda Sayısı</small>
+                <small>Oda sayısı</small>
                 <strong>{listing.room}</strong>
               </span>
             </div>
             <div>
               <Icon name="area" />
               <span>
-                <small>Kullanım Alanı</small>
+                <small>Brüt alan</small>
                 <strong>{listing.area} m²</strong>
               </span>
             </div>
             <div>
               <Icon name="home" />
               <span>
-                <small>Bulunduğu Kat</small>
+                <small>Kat bilgisi</small>
                 <strong>{listing.floor}</strong>
               </span>
             </div>
@@ -899,12 +849,12 @@ function DetailPage({
 
           <section className="detail-section">
             <span className="section-kicker">İLAN HAKKINDA</span>
-            <h2>Portföy Açıklaması</h2>
+            <h2>Konforun her tonunu keşfedin</h2>
             <div
               style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 lineHeight: '1.8',
-                color: '#3d3844',
+                color: '#46414d',
                 whiteSpace: 'pre-line',
               }}
             >
@@ -914,19 +864,19 @@ function DetailPage({
 
           <section className="detail-section">
             <span className="section-kicker">ÖZELLİKLER</span>
-            <h2>Gayrimenkul Detayları</h2>
+            <h2>İlan detayları</h2>
             <div className="spec-grid">
               {[
-                ['İlan No', `RNK-${listing.id}`],
-                ['İlan Tarihi', listing.date || 'Ekim 2026'],
-                ['Emlak Tipi', listing.type],
-                ['Net Alan', `${Math.max(20, listing.area - 15)} m²`],
-                ['Bina Yaşı', listing.buildingAge || '15-20'],
-                ['Banyo Sayısı', listing.bathrooms || '1'],
+                ['İlan no', `RNK-${listing.id}`],
+                ['İlan tarihi', listing.date || '12 Haziran 2025'],
+                ['Emlak tipi', listing.type],
+                ['Net alan', `${Math.max(20, listing.area - 15)} m²`],
+                ['Bina yaşı', listing.buildingAge || '15-20'],
+                ['Banyo', listing.bathrooms || '1'],
                 ['Isıtma', listing.heating || 'Kombi (Doğalgaz)'],
-                ['Kullanım Durumu', 'Boş / Taşınmaya Hazır'],
-                ['Tapu Durumu', 'Kat Mülkiyeti'],
-                ['Krediye Uygunluk', 'Evet / Uygun'],
+                ['Kullanım', 'Boş'],
+                ['Tapu', 'Kat mülkiyeti'],
+                ['Krediye uygun', 'Evet'],
               ].map(([key, value]) => (
                 <div key={key}>
                   <span>{key}</span>
@@ -937,19 +887,18 @@ function DetailPage({
           </section>
 
           <section className="detail-section">
-            <span className="section-kicker">DONANIMLAR & ÇEVRE</span>
-            <h2>Öne Çıkan Özellikler</h2>
+            <span className="section-kicker">ÖNE ÇIKANLAR</span>
+            <h2>Yaşam alanı özellikleri</h2>
             <div className="amenities">
               {(
                 listing.amenities || [
-                  'Kombi / Doğalgaz',
-                  'PVC Isıcam Doğrama',
-                  'Çelik Kapı',
-                  'Laminat Parke',
-                  'Merkezi Konum',
-                  'Toplu Ulaşıma Yakın',
-                  'Okullara Yakın',
-                  'Semt Pazarına Yakın',
+                  'Akıllı ev sistemi',
+                  'Kapalı otopark',
+                  '7/24 güvenlik',
+                  'Geniş teras',
+                  'Giyinme odası',
+                  'Ankastre mutfak',
+                  'Ebeveyn banyosu',
                 ]
               ).map((item) => (
                 <span key={item}>
@@ -971,28 +920,19 @@ function DetailPage({
             </div>
             <div>
               <strong>Mesut KAYA</strong>
-              <span>Renk Emlak Danışmanı</span>
+              <span>Gayrimenkul Danışmanı</span>
             </div>
           </div>
           <p>
-            Bu ilanla ilgili detaylı ekspertiz bilgisi almak ve yerinde görmek için bizimle iletişime
-            geçebilirsiniz.
+            Bu ilanla ilgili tüm sorularınız ve özel gösterim talebiniz için bana ulaşabilirsiniz.
           </p>
-
           <a
             href="tel:03123521515"
             className="call-button"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-            }}
+            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
           >
             <Icon name="phone" /> (0312) 352 15 15
           </a>
-
           <a
             href={`https://wa.me/905423521515?text=${whatsappMessage}`}
             target="_blank"
@@ -1007,31 +947,129 @@ function DetailPage({
               backgroundColor: '#25D366',
               color: 'white',
               border: 'none',
-              fontWeight: 700,
+              marginTop: '10px',
             }}
           >
             <Icon name="whatsapp" size={18} /> WhatsApp ile Mesaj Yaz
           </a>
-
-          <div
-            style={{
-              marginTop: '16px',
-              padding: '12px',
-              background: 'var(--canvas)',
-              borderRadius: '8px',
-              fontSize: '12px',
-              color: 'var(--muted)',
-              lineHeight: '1.5',
-            }}
-          >
-            <strong>Renk Emlak Ofisi:</strong>
-            <br />
-            Etlik Aşağı Eğlence Mah. Giresun Cad. Sazan Cad. No:4 Keçiören / Ankara
-          </div>
-          <small>İlan yetkilimizle görüşürken lütfen ilan numarasını (RNK-{listing.id}) belirtiniz.</small>
+          <small>İlan sahibiyle iletişime geçtiğinizde ilan numarasını belirtiniz.</small>
         </aside>
       </div>
     </main>
+  )
+}
+
+function LoginModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isRegister, setIsRegister] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    alert(isRegister ? 'Kayıt başarılı! Giriş yapabilirsiniz.' : 'Giriş başarılı!')
+    onClose()
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 100,
+        backgroundColor: 'rgba(23, 21, 29, 0.75)',
+        backdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          maxWidth: '420px',
+          width: '100%',
+          padding: '32px',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+          position: 'relative',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            border: 0,
+            background: 'none',
+            color: 'var(--muted)',
+            cursor: 'pointer',
+          }}
+          aria-label="Kapat"
+        >
+          <Icon name="close" size={22} />
+        </button>
+
+        <span className="section-kicker">RENK EMLAK</span>
+        <h2 style={{ fontSize: '22px', margin: '6px 0 16px' }}>
+          {isRegister ? 'Yeni Hesap Oluştur' : 'Giriş Yap'}
+        </h2>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
+            E-posta Adresi
+            <input
+              type="email"
+              required
+              placeholder="ornek@renkemlak.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                border: '1px solid var(--line)',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                fontSize: '14px',
+              }}
+            />
+          </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
+            Şifre
+            <input
+              type="password"
+              required
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                border: '1px solid var(--line)',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                fontSize: '14px',
+              }}
+            />
+          </label>
+
+          <button type="submit" className="primary-button" style={{ width: '100%', marginTop: '6px' }}>
+            {isRegister ? 'Kayıt Ol' : 'Giriş Yap'}
+          </button>
+
+          <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '13px', color: 'var(--muted)' }}>
+            {isRegister ? 'Zaten hesabınız var mı? ' : 'Hesabınız yok mu? '}
+            <button
+              type="button"
+              onClick={() => setIsRegister(!isRegister)}
+              style={{ border: 0, background: 'none', color: 'var(--purple)', fontWeight: 700, cursor: 'pointer' }}
+            >
+              {isRegister ? 'Giriş Yap' : 'Kayıt Ol'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
 
@@ -1039,7 +1077,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [type, setType] = useState('Satılık')
+  const [type, setType] = useState('Satılık Daire')
   const [note, setNote] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1124,7 +1162,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
             <span className="section-kicker">RENK EMLAK DESTEK</span>
             <h2 style={{ fontSize: '22px', margin: '6px 0 16px' }}>Ücretsiz İlan & Ekspertiz Talebi</h2>
             <p style={{ color: 'var(--muted)', fontSize: '13px', marginBottom: '20px' }}>
-              Keçiören ve Etlik bölgesindeki mülkünüzü değerinde satmak veya kiralamak için bilgilerinizi bırakın, uzmanımız sizi arasın.
+              Mülkünüzü değerinde satmak veya kiralamak için bilgilerinizi bırakın, uzmanımız sizi arasın.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -1229,28 +1267,25 @@ function Footer() {
           Kiralık İlanlar
         </button>
         <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-          Ticari Gayrimenkuller
+          Yeni Projeler
         </button>
       </div>
       <div>
         <strong>Renk Emlak</strong>
-        <button onClick={() => document.querySelector('#hakkimizda')?.scrollIntoView({ behavior: 'smooth' })}>
+        <button onClick={() => document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })}>
           Hakkımızda
         </button>
         <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-          Portföyümüz
+          Danışmanlarımız
         </button>
         <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>
           İletişim
         </button>
       </div>
       <div className="footer-contact">
-        <strong>Bize Ulaşın</strong>
+        <strong>Bize ulaşın</strong>
         <a href="tel:03123521515" style={{ color: 'inherit', textDecoration: 'none' }}>
-          <span>(0312) 352 15 15</span>
-        </a>
-        <a href="tel:05423521515" style={{ color: 'inherit', textDecoration: 'none' }}>
-          <span>0542 352 15 15</span>
+          <span>+90 312 352 15 15</span>
         </a>
         <a href="mailto:info@renkemlak.com" style={{ color: 'inherit', textDecoration: 'none' }}>
           <span>info@renkemlak.com</span>
@@ -1266,9 +1301,10 @@ function Footer() {
 
 export default function App() {
   const [selected, setSelected] = useState<Listing | null>(null)
-  const [filterStatus, setFilterStatus] = useState<'Tümü' | 'Satılık' | 'Kiralık'>('Tümü')
+  const [filterStatus, setFilterStatus] = useState<'Satılık' | 'Kiralık' | 'Proje'>('Satılık')
   const [savedIds, setSavedIds] = useState<Set<number>>(() => new Set())
   const [consultationOpen, setConsultationOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
 
   const toggleSave = (id: number) => {
     setSavedIds((prev) => {
@@ -1292,16 +1328,29 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleNavigate = (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => {
+    setSelected(null)
+    if (tab === 'Satılık') {
+      setFilterStatus('Satılık')
+      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+    } else if (tab === 'Kiralık') {
+      setFilterStatus('Kiralık')
+      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+    } else if (tab === 'Projeler') {
+      setFilterStatus('Proje')
+      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+    } else if (tab === 'Kurumsal') {
+      document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <div className="app">
       <Header
         onHome={goHome}
-        onFilterStatus={(st) => {
-          setFilterStatus(st)
-          document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-        }}
+        onNavigate={handleNavigate}
         onOpenConsultation={() => setConsultationOpen(true)}
-        savedCount={savedIds.size}
+        onOpenLogin={() => setLoginOpen(true)}
       />
       {selected ? (
         <DetailPage
@@ -1321,6 +1370,7 @@ export default function App() {
       )}
       <Footer />
       {consultationOpen && <ConsultationModal onClose={() => setConsultationOpen(false)} />}
+      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
     </div>
   )
 }
