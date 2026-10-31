@@ -1,0 +1,10 @@
+{
+  "description": "Browse property listings, refine results with modern filters, and explore detailed real estate information for homes that suit your needs.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
