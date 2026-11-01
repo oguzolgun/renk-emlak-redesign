@@ -27,6 +27,20 @@ const Icon = ({
     | 'chart'
     | 'layers'
     | 'fullscreen'
+    | 'bus'
+    | 'train'
+    | 'car'
+    | 'road'
+    | 'school'
+    | 'graduation'
+    | 'building'
+    | 'hospital'
+    | 'stethoscope'
+    | 'tree'
+    | 'cart'
+    | 'coffee'
+    | 'info'
+    | 'trendUp'
   size?: number
 }) => {
   const paths: Record<typeof name, ReactNode> = {
@@ -130,6 +144,97 @@ const Icon = ({
     fullscreen: (
       <>
         <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+      </>
+    ),
+    bus: (
+      <>
+        <rect width="16" height="15" x="4" y="3" rx="2" />
+        <path d="M4 10h16M8 14h.01M16 14h.01M6 18v2M18 18v2" />
+      </>
+    ),
+    train: (
+      <>
+        <rect width="16" height="14" x="4" y="3" rx="2" />
+        <path d="M4 10h16M12 3v7M8 17l-2 3M16 17l2 3" />
+        <circle cx="8" cy="14" r="1" />
+        <circle cx="16" cy="14" r="1" />
+      </>
+    ),
+    car: (
+      <>
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+        <circle cx="7" cy="17" r="2" />
+        <path d="M9 17h6" />
+        <circle cx="17" cy="17" r="2" />
+      </>
+    ),
+    road: (
+      <path d="m4 19 4-14M20 19l-4-14M12 5v2M12 11v2M12 17v2" />
+    ),
+    school: (
+      <>
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+        <path d="M6 6h10M6 10h10" />
+      </>
+    ),
+    graduation: (
+      <>
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      </>
+    ),
+    building: (
+      <>
+        <rect width="16" height="19" x="4" y="3" rx="2" />
+        <path d="M9 22v-4h6v4M8 7h.01M16 7h.01M12 7h.01M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01" />
+      </>
+    ),
+    hospital: (
+      <>
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M12 8v8M8 12h8" />
+      </>
+    ),
+    stethoscope: (
+      <>
+        <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+        <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" />
+        <circle cx="20" cy="10" r="2" />
+      </>
+    ),
+    tree: (
+      <>
+        <path d="M12 19v3" />
+        <path d="M12 2a7 7 0 0 0-6 10.5 4 4 0 0 0 3.5 5.5h5a4 4 0 0 0 3.5-5.5A7 7 0 0 0 12 2Z" />
+      </>
+    ),
+    cart: (
+      <>
+        <circle cx="8" cy="21" r="1" />
+        <circle cx="19" cy="21" r="1" />
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+      </>
+    ),
+    coffee: (
+      <>
+        <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+        <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+        <line x1="6" x2="6" y1="2" y2="4" />
+        <line x1="10" x2="10" y1="2" y2="4" />
+        <line x1="14" x2="14" y1="2" y2="4" />
+      </>
+    ),
+    info: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 16v-4" />
+        <path d="M12 8h.01" />
+      </>
+    ),
+    trendUp: (
+      <>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+        <polyline points="16 7 22 7 22 13" />
       </>
     ),
   }
@@ -262,7 +367,6 @@ function Hero({ onExplore }: { onExplore: () => void }) {
       if (!hero) return
       const rect = hero.getBoundingClientRect()
       const distance = hero.clientHeight - window.innerHeight
-      // Smooth eased progression over long 300vh scroll
       const raw = Math.min(1, Math.max(0, -rect.top / Math.max(distance, 1)))
       setProgress(raw)
     }
@@ -271,44 +375,15 @@ function Hero({ onExplore }: { onExplore: () => void }) {
     return () => window.removeEventListener('scroll', update)
   }, [])
 
-  const handlePointerAction = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.buttons === 1) {
-      const rect = e.currentTarget.getBoundingClientRect()
-      const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
-      setProgress(ratio)
-    }
-  }
-
   return (
     <section className="hero-scroll">
-      <div
-        className="hero-sticky"
-        onPointerDown={handlePointerAction}
-        onPointerMove={handlePointerAction}
-        style={{ cursor: 'ew-resize' }}
-      >
+      <div className="hero-sticky">
         <div className="hero-image hero-muted" />
         <div
           className="hero-image hero-color"
-          style={{ clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }}
+          style={{ opacity: progress }}
         />
         <div className="hero-shade" />
-
-        {/* Floating Indicator Badges */}
-        <div className="hero-badge-left">⚪ SİYAH & BEYAZ</div>
-        <div className="hero-badge-right">✨ CANLI RENKLER</div>
-
-        {/* Dynamic Split Line & Glowing Handle */}
-        <div
-          className="hero-split-line"
-          style={{ left: `${Math.min(99.5, Math.max(0.5, progress * 100))}%` }}
-        >
-          <div className="hero-split-handle">
-            <span>◀</span>
-            <span>{progress < 0.05 ? 'KAYDIRIN' : `%${Math.round(progress * 100)} CANLILIK`}</span>
-            <span>▶</span>
-          </div>
-        </div>
 
         <div className="hero-content">
           <p className="eyebrow">
@@ -322,23 +397,15 @@ function Hero({ onExplore }: { onExplore: () => void }) {
           <p className="hero-copy">
             Doğru evi bulmak bir aramadan fazlası.
             <br />
-            Yavaşça aşağı kaydırın, evinizin gerçek renkleriyle canlandığını izleyin.
+            Size iyi hissettirecek yaşam alanını birlikte keşfedelim.
           </p>
           <button className="hero-cta" onClick={onExplore}>
             İlanları Keşfet <Icon name="arrow" />
           </button>
         </div>
 
-        <div className="color-meter">
-          <span>SİYAH-BEYAZ</span>
-          <div>
-            <i style={{ height: `${Math.max(6, progress * 100)}%` }} />
-          </div>
-          <span>% {Math.round(progress * 100)}</span>
-        </div>
-
         <div className="scroll-cue">
-          <span>Aşağı kaydırdıkça renklenir (veya sağa sürükleyin)</span>
+          <span>Keşfetmek için kaydırın</span>
           <b>
             <i />
           </b>
@@ -721,37 +788,41 @@ function HomePage({
       </main>
 
       <section id="kurumsal" className="trust-band">
-        <div>
+        <div className="trust-band-intro">
           <span className="section-kicker light">RENK EMLAK FARKI</span>
           <h2>
-            Kararınız net,
-            <br />
-            süreciniz <em>güvenli.</em>
+            Kararınız net, süreciniz <em>güvenli.</em>
           </h2>
+          <p>
+            Ankara Keçiören ve Etlik bölgesinde 15 yılı aşkın tecrübe, yetkili uzman danışman kadrosu ve kurumsal şeffaflık ile yanınızdayız.
+          </p>
         </div>
-        {[
-          [
-            '01',
-            'EİDS & Taşınmaz Doğrulama',
-            'Tüm portföyümüz Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi (EİDS) mevzuatına uygun, Taşınmaz Numaralı ve doğrulanmıştır.',
-          ],
-          [
-            '02',
-            'Bölge ve Harita Uzmanlığı',
-            'Keçiören, Etlik ve Ankara genelinde harita, ada/parsel ve güncel piyasa ekspertizi sunarız.',
-          ],
-          [
-            '03',
-            'Uçtan uca destek',
-            'İlk geziden tapu ve anahtar teslim sürecine kadar her adımda yanınızdayız.',
-          ],
-        ].map(([no, title, text]) => (
-          <article key={no}>
-            <span>{no}</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </article>
-        ))}
+
+        <div className="trust-band-cards">
+          {[
+            [
+              '01',
+              'EİDS & Taşınmaz Doğrulama',
+              'Tüm gayrimenkul portföyümüz Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi mevzuatına uygun, Taşınmaz Numaralı ve yerinde incelenmiştir.',
+            ],
+            [
+              '02',
+              'Bölge & Lokasyon Uzmanlığı',
+              'Keçiören, Etlik ve Ankara genelinde cadde cadde güncel piyasa değeri, ada/parsel analizi ve amortisman rehberliği sunuyoruz.',
+            ],
+            [
+              '03',
+              'Uçtan Uca Hukuki & Tapu Desteği',
+              'İlk yer gösteriminden kredi tekliflerine, belediye rayiç bedelinden tapu devrine kadar her adımda profesyonel danışmanlık.',
+            ],
+          ].map(([no, title, text]) => (
+            <article key={no} className="trust-card">
+              <span className="trust-number">{no}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </>
   )
@@ -791,34 +862,34 @@ function DetailPage({
 
   const nearbyPlaces: Record<string, { icon: string; title: string; dist: string; desc: string }[]> = {
     ulasim: [
-      { icon: '🚌', title: 'EGO Otobüs Durağı', dist: '120 m', desc: 'Yürüme 1-2 dk · Hatlar: 260, 261, 263' },
-      { icon: '🚐', title: 'Etlik - Ulus - Sıhhiye Dolmuş Hattı', dist: '150 m', desc: 'Yürüme 2 dk · 3 dakikada bir sefer' },
-      { icon: '🚇', title: 'Keçiören Metro İstasyonu', dist: '1.2 km', desc: 'Araçla 3 dk · Ring otobüsü geçer' },
-      { icon: '🛣️', title: 'Ankara Çevre Yolu & Anadolu Bulvarı', dist: '2.5 km', desc: 'Araçla 5 dk hızlı ana aks bağlantısı' },
+      { icon: 'bus', title: 'EGO Otobüs Durağı', dist: '120 m', desc: 'Yürüme 1-2 dk · Hatlar: 260, 261, 263' },
+      { icon: 'car', title: 'Etlik - Ulus - Sıhhiye Dolmuş Hattı', dist: '150 m', desc: 'Yürüme 2 dk · 3 dakikada bir sefer' },
+      { icon: 'train', title: 'Keçiören Metro İstasyonu', dist: '1.2 km', desc: 'Araçla 3 dk · Ring otobüsü geçer' },
+      { icon: 'road', title: 'Ankara Çevre Yolu & Anadolu Bulvarı', dist: '2.5 km', desc: 'Araçla 5 dk hızlı ana aks bağlantısı' },
     ],
     egitim: [
-      { icon: '🏫', title: 'Yalçın Eskiyapan İlkokulu', dist: '250 m', desc: 'Yürüme 3 dk · Köklü devlet okulu' },
-      { icon: '🎓', title: 'Etlik Anadolu Lisesi', dist: '550 m', desc: 'Yürüme 7 dk · Başarılı eğitim kadrosu' },
-      { icon: '👶', title: 'Keçiören Belediyesi Gündüz Bakımevi & Kreş', dist: '180 m', desc: 'Yürüme 2 dk' },
-      { icon: '🏛️', title: 'Gülhane Sağlık Bilimleri Üniversitesi', dist: '1.4 km', desc: 'Araçla 4 dk / Otobüsle 8 dk' },
+      { icon: 'school', title: 'Yalçın Eskiyapan İlkokulu', dist: '250 m', desc: 'Yürüme 3 dk · Köklü devlet okulu' },
+      { icon: 'graduation', title: 'Etlik Anadolu Lisesi', dist: '550 m', desc: 'Yürüme 7 dk · Başarılı eğitim kadrosu' },
+      { icon: 'building', title: 'Keçiören Belediyesi Gündüz Bakımevi & Kreş', dist: '180 m', desc: 'Yürüme 2 dk' },
+      { icon: 'school', title: 'Gülhane Sağlık Bilimleri Üniversitesi', dist: '1.4 km', desc: 'Araçla 4 dk / Otobüsle 8 dk' },
     ],
     saglik: [
-      { icon: '🏥', title: 'Etlik Şehir Hastanesi', dist: '1.1 km', desc: 'Araçla 4 dk · Türkiye’nin en büyük hastanelerinden biri' },
-      { icon: '🩺', title: 'Aşağı Eğlence Aile Sağlığı Merkezi', dist: '350 m', desc: 'Yürüme 4 dk · Aile hekimliği ve aşı merkezi' },
-      { icon: '💊', title: 'Nöbetçi Eczaneler & Medikal', dist: '90 m', desc: 'Yürüme 1 dk · Cadde üzerinde 4 eczane' },
-      { icon: '🚑', title: 'Gülhane Eğitim ve Araştırma Hastanesi (GATA)', dist: '1.8 km', desc: 'Araçla 6 dk' },
+      { icon: 'hospital', title: 'Etlik Şehir Hastanesi', dist: '1.1 km', desc: 'Araçla 4 dk · Türkiye’nin en büyük hastanelerinden biri' },
+      { icon: 'stethoscope', title: 'Aşağı Eğlence Aile Sağlığı Merkezi', dist: '350 m', desc: 'Yürüme 4 dk · Aile hekimliği ve aşı merkezi' },
+      { icon: 'hospital', title: 'Nöbetçi Eczaneler & Medikal', dist: '90 m', desc: 'Yürüme 1 dk · Cadde üzerinde 4 eczane' },
+      { icon: 'hospital', title: 'Gülhane Eğitim ve Araştırma Hastanesi (GATA)', dist: '1.8 km', desc: 'Araçla 6 dk' },
     ],
     yesil: [
-      { icon: '🌳', title: 'Yunus Emre Parkı & Koşu Parkuru', dist: '200 m', desc: 'Yürüme 2 dk · Çocuk parkı ve yeşil alan' },
-      { icon: '⛲', title: 'Keçiören Şelale & Botanik Parkı', dist: '1.5 km', desc: 'Araçla 5 dk · Aile rekreasyon alanı' },
-      { icon: '⚽', title: 'Keçiören Belediyesi Kapalı Spor Kompleksi & Havuz', dist: '600 m', desc: 'Yürüme 8 dk' },
-      { icon: '🌲', title: 'Kartaltepe Kent Ormanı', dist: '3.2 km', desc: 'Araçla 8 dk mesire alanı' },
+      { icon: 'tree', title: 'Yunus Emre Parkı & Koşu Parkuru', dist: '200 m', desc: 'Yürüme 2 dk · Çocuk parkı ve yeşil alan' },
+      { icon: 'tree', title: 'Keçiören Şelale & Botanik Parkı', dist: '1.5 km', desc: 'Araçla 5 dk · Aile rekreasyon alanı' },
+      { icon: 'tree', title: 'Keçiören Belediyesi Kapalı Spor Kompleksi & Havuz', dist: '600 m', desc: 'Yürüme 8 dk' },
+      { icon: 'tree', title: 'Kartaltepe Kent Ormanı', dist: '3.2 km', desc: 'Araçla 8 dk mesire alanı' },
     ],
     alisveris: [
-      { icon: '🛒', title: 'Aşağı Eğlence Kapalı Semt Pazarı', dist: '280 m', desc: 'Salı & Cumartesi günleri taze pazar' },
-      { icon: '🏬', title: 'Antares AVM & Yaşam Merkezi', dist: '1.8 km', desc: 'Araçla 5 dk · Sinema, eğlence, mağazalar' },
-      { icon: '🍞', title: 'Zincir Marketler (Migros, Bim, A101, Şok, Fırın)', dist: '80 m', desc: 'Apartmanın hemen karşısında' },
-      { icon: '☕', title: 'Giresun Caddesi Kafe ve Restoranlar', dist: '350 m', desc: 'Sosyal yaşam aksı' },
+      { icon: 'cart', title: 'Aşağı Eğlence Kapalı Semt Pazarı', dist: '280 m', desc: 'Salı & Cumartesi günleri taze pazar' },
+      { icon: 'building', title: 'Antares AVM & Yaşam Merkezi', dist: '1.8 km', desc: 'Araçla 5 dk · Sinema, eğlence, mağazalar' },
+      { icon: 'cart', title: 'Zincir Marketler (Migros, Bim, A101, Şok, Fırın)', dist: '80 m', desc: 'Apartmanın hemen karşısında' },
+      { icon: 'coffee', title: 'Giresun Caddesi Kafe ve Restoranlar', dist: '350 m', desc: 'Sosyal yaşam aksı' },
     ],
   }
 
@@ -912,76 +983,119 @@ function DetailPage({
 
       {/* 2-Column Sahibinden Style Showcase */}
       <div className="sahibinden-top-grid">
-        {/* Left Column: Gallery */}
-        <div className="sahibinden-gallery">
-          <div className="gallery-main-frame">
-            <img
-              src={images[activeImageIndex]}
-              alt={listing.title}
-              onClick={() => setIsLightboxOpen(true)}
-            />
-            {images.length > 1 && (
-              <>
-                <button
-                  className="gallery-nav-btn gallery-nav-prev"
-                  onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
-                  aria-label="Önceki fotoğraf"
-                >
-                  ‹
-                </button>
-                <button
-                  className="gallery-nav-btn gallery-nav-next"
-                  onClick={() => setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
-                  aria-label="Sonraki fotoğraf"
-                >
-                  ›
-                </button>
-              </>
-            )}
-            <div className="gallery-counter-badge">
-              {activeImageIndex + 1} / {images.length} Fotoğraf
+        {/* Left Column: Gallery + Danışman (Sol Alt Tarafta) */}
+        <div className="sahibinden-left-col">
+          <div className="sahibinden-gallery-wrapper">
+            <div className="sahibinden-gallery-row">
+              {/* Vertical Thumbnails on the LEFT */}
+              {images.length > 1 && (
+                <div className="gallery-vertical-thumbs">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      className={`gallery-vthumb-item ${activeImageIndex === idx ? 'active' : ''}`}
+                      onClick={() => setActiveImageIndex(idx)}
+                      aria-label={`Fotoğraf ${idx + 1}`}
+                    >
+                      <img src={img} alt={`${listing.title} - ${idx + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Main Display Frame on the RIGHT */}
+              <div className="gallery-main-frame">
+                <img
+                  src={images[activeImageIndex]}
+                  alt={listing.title}
+                  onClick={() => setIsLightboxOpen(true)}
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      className="gallery-nav-btn gallery-nav-prev"
+                      onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
+                      aria-label="Önceki fotoğraf"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      className="gallery-nav-btn gallery-nav-next"
+                      onClick={() => setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
+                      aria-label="Sonraki fotoğraf"
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
+                <div className="gallery-counter-badge">
+                  {activeImageIndex + 1} / {images.length} Fotoğraf
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions Bar */}
+            <div className="gallery-action-bar">
+              <button onClick={() => setIsLightboxOpen(true)}>
+                <Icon name="fullscreen" size={15} /> Büyük Fotoğraf
+              </button>
+              <button onClick={() => scrollToTabs('location')}>
+                <Icon name="compass" size={15} /> Harita & Konum
+              </button>
+              <button onClick={() => scrollToTabs('index')}>
+                <Icon name="chart" size={15} /> Emlak Endeksi
+              </button>
+            </div>
+
+            {/* Sub Navigation Links */}
+            <div className="gallery-sub-links">
+              <button onClick={() => scrollToTabs('index')}>
+                <Icon name="chart" size={13} /> Emlak Endeksi
+              </button>
+              <span>|</span>
+              <button onClick={onOpenConsultation}>
+                <Icon name="check" size={13} /> Gayrimenkul Ekspertiz
+              </button>
+              <span>|</span>
+              <button onClick={() => scrollToTabs('location')}>
+                <Icon name="pin" size={13} /> Bölge Rehberi
+              </button>
             </div>
           </div>
 
-          {/* Quick Actions Bar */}
-          <div className="gallery-action-bar">
-            <button onClick={() => setIsLightboxOpen(true)}>
-              <Icon name="fullscreen" size={15} /> Büyük Fotoğraf
-            </button>
-            <button onClick={() => scrollToTabs('location')}>
-              <Icon name="compass" size={15} /> Harita & Konum
-            </button>
-            <button onClick={() => scrollToTabs('index')}>
-              <Icon name="chart" size={15} /> Emlak Endeksi
-            </button>
-          </div>
-
-          {/* Thumbnails Row */}
-          {images.length > 1 && (
-            <div className="gallery-thumbs-row">
-              {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  className={`gallery-thumb-item ${activeImageIndex === idx ? 'active' : ''}`}
-                  onClick={() => setActiveImageIndex(idx)}
-                >
-                  <img src={img} alt={`Fotoğraf ${idx + 1}`} />
-                </button>
-              ))}
+          {/* Gayrimenkul Danışmanı Kartı - SOL ALT TARAFTA */}
+          <div className="sahibinden-agent-card agent-in-left-col">
+            <div className="agent-badge-official">Yetkili Portföy Ofisi</div>
+            <div className="agent-main-row">
+              <img src="/renk-emlak-logo.png" alt="Renk Emlak" className="agent-brand-logo" />
+              <div className="agent-details">
+                <div className="agent-name-title">
+                  <strong>Mesut KAYA</strong>
+                  <span className="agent-cert-pill">Yetki Belge No: 0600124</span>
+                </div>
+                <span className="agent-agency">Renk Emlak Danışmanlık · Keçiören Temsilciliği</span>
+                <p className="agent-bio">
+                  Bölge uzmanı gayrimenkul danışmanımız ile doğrudan iletişime geçebilir, yerinde sunum ve ekspertiz randevusu talep edebilirsiniz.
+                </p>
+              </div>
             </div>
-          )}
-
-          {/* Sub Navigation Links */}
-          <div className="gallery-sub-links">
-            <button onClick={() => scrollToTabs('index')}>📈 Emlak Endeksi</button>
-            <span>|</span>
-            <button onClick={onOpenConsultation}>📑 Gayrimenkul Ekspertiz</button>
-            <span>|</span>
-            <button onClick={() => scrollToTabs('location')}>📍 Bölge Rehberi</button>
+            <div className="agent-quick-actions">
+              <a href="tel:03123521515" className="agent-phone-btn">
+                <Icon name="phone" size={15} /> 0 (312) 352 15 15
+              </a>
+              <a
+                href={`https://wa.me/905423521515?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noreferrer"
+                className="agent-wa-btn"
+              >
+                <Icon name="whatsapp" size={15} /> WhatsApp İle Mesaj Gönder
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Price, Agent & Specs Table */}
+        {/* Right Column: Price & 27-row Specs Table */}
         <div className="sahibinden-info-col">
           <div className="sahibinden-price-card">
             <div>
@@ -992,42 +1106,10 @@ function DetailPage({
             </div>
             <button
               onClick={onOpenConsultation}
-              style={{
-                border: '1px solid #cbd5e1',
-                background: '#f8fafc',
-                color: '#2563eb',
-                borderRadius: '6px',
-                padding: '6px 12px',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
+              className="kredi-teklif-btn"
             >
-              Kredi & Ekspertiz Teklifi
+              Kredi Teklifleri
             </button>
-          </div>
-
-          {/* Danışman Kartı */}
-          <div className="sahibinden-agent-card">
-            <img src="/renk-emlak-logo.png" alt="Renk Emlak" className="agent-brand-logo" />
-            <div className="agent-details">
-              <strong>Mesut KAYA</strong>
-              <span>Gayrimenkul Portföy Danışmanı</span>
-              <span style={{ color: '#059669', fontWeight: 600 }}>Yetki Belge No: 0600124</span>
-            </div>
-            <div className="agent-quick-actions">
-              <a href="tel:03123521515" className="agent-phone-btn">
-                <Icon name="phone" size={14} /> 0 (312) 352 15 15
-              </a>
-              <a
-                href={`https://wa.me/905423521515?text=${whatsappMessage}`}
-                target="_blank"
-                rel="noreferrer"
-                className="agent-wa-btn"
-              >
-                <Icon name="whatsapp" size={14} /> WhatsApp
-              </a>
-            </div>
           </div>
 
           {/* Sahibinden Specification Table */}
@@ -1045,7 +1127,7 @@ function DetailPage({
                       {listing.eid}
                     </span>
                     <span className="spec-eid-verified" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi">
-                      ✓ EİDS Onaylı
+                      <Icon name="check" size={11} /> EİDS Onaylı
                     </span>
                   </td>
                 </tr>
@@ -1207,7 +1289,7 @@ function DetailPage({
                 <div className="tab-features-grid">
                   {listing.interiorFeatures.map((feat) => (
                     <div key={feat} className="tab-feature-item">
-                      <span className="tab-feature-check">✓</span>
+                      <span className="tab-feature-check"><Icon name="check" size={12} /></span>
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -1222,7 +1304,7 @@ function DetailPage({
                 <div className="tab-features-grid">
                   {listing.exteriorFeatures.map((feat) => (
                     <div key={feat} className="tab-feature-item">
-                      <span className="tab-feature-check">✓</span>
+                      <span className="tab-feature-check"><Icon name="check" size={12} /></span>
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -1237,7 +1319,7 @@ function DetailPage({
                 <div className="tab-features-grid">
                   {listing.neighborhoodFeatures.map((feat) => (
                     <div key={feat} className="tab-feature-item">
-                      <span className="tab-feature-check">✓</span>
+                      <span className="tab-feature-check"><Icon name="check" size={12} /></span>
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -1284,8 +1366,9 @@ function DetailPage({
               </div>
 
               {showM2Map && (
-                <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', fontSize: '13px', color: '#92400e' }}>
-                  📍 <strong>{listing.neighborhood}</strong> ortalama metrekare satış fiyatı: <strong>₺{listing.pricePerM2.toLocaleString('tr-TR')} / m²</strong>. Bölge değer artış trendinde öncü konumdadır.
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', fontSize: '13px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Icon name="pin" size={15} />
+                  <span><strong>{listing.neighborhood}</strong> ortalama metrekare satış fiyatı: <strong>₺{listing.pricePerM2.toLocaleString('tr-TR')} / m²</strong>. Bölge değer artış trendinde öncü konumdadır.</span>
                 </div>
               )}
 
@@ -1321,7 +1404,9 @@ function DetailPage({
                 <div className="nearby-items-grid">
                   {(nearbyPlaces[nearbyCat] || nearbyPlaces.ulasim).map((item, idx) => (
                     <div key={idx} className="nearby-item-card">
-                      <span className="nearby-item-icon">{item.icon}</span>
+                      <span className="nearby-item-icon">
+                        <Icon name={item.icon as any} size={16} />
+                      </span>
                       <div className="nearby-item-info">
                         <strong>{item.title} · <span style={{ color: '#2563eb' }}>{item.dist}</span></strong>
                         <span>{item.desc}</span>
@@ -1367,20 +1452,22 @@ function DetailPage({
               {/* Summary Cards */}
               <div className="endeks-summary-cards">
                 <div className="endeks-stat-card">
-                  <div className="stat-card-label">
-                    <span>🧮 EYLÜL 2026 ORTALAMASI</span>
+                  <div className="stat-card-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Icon name="chart" size={13} />
+                    <span>EYLÜL 2026 ORTALAMASI</span>
                   </div>
                   <div className="stat-card-value">
                     ₺{listing.pricePerM2.toLocaleString('tr-TR')} TL <span style={{ fontSize: '16px', color: '#64748b' }}>/ m²</span>
                   </div>
                 </div>
                 <div className="endeks-stat-card">
-                  <div className="stat-card-label">
-                    <span>📈 1 YILLIK DEĞİŞİM</span>
+                  <div className="stat-card-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Icon name="trendUp" size={13} />
+                    <span>1 YILLIK DEĞİŞİM</span>
                   </div>
                   <div className="stat-card-value">
                     <span className="stat-growth-tag">
-                      {listing.yearlyChange} ↗
+                      {listing.yearlyChange} +
                     </span>
                   </div>
                 </div>
@@ -1843,8 +1930,9 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                     fontWeight: 600,
                   }}
                 />
-                <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 400, marginTop: '2px', lineHeight: 1.4 }}>
-                  💡 <strong>Taşınmaz Numaranızı bilmiyor musunuz?</strong> E-Devlet hesabınıza giriş yaparak <em>"Tapu Bilgileri Sorgulama"</em> sayfasından mülkünüze ait Taşınmaz Numarasını (EİD) görebilirsiniz.
+                <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 400, marginTop: '2px', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                  <Icon name="info" size={15} />
+                  <span><strong>Taşınmaz Numaranızı bilmiyor musunuz?</strong> E-Devlet hesabınıza giriş yaparak <em>"Tapu Bilgileri Sorgulama"</em> sayfasından mülkünüze ait Taşınmaz Numarasını (EİD) görebilirsiniz.</span>
                 </span>
               </label>
 
