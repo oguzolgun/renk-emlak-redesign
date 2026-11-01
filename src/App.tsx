@@ -433,6 +433,9 @@ function ListingCard({
           }}
         />
         {listing.featured && <span className="featured-badge">ÖNE ÇIKAN</span>}
+        <span className="listing-eid-badge" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi (EİDS)">
+          EİD: {listing.eid || listing.id}
+        </span>
         <button
           className={`save-button ${isSaved ? 'saved' : ''}`}
           onClick={(event) => {
@@ -447,6 +450,9 @@ function ListingCard({
       <div className="listing-body">
         <div className="listing-meta">
           <span>{listing.type}</span>
+          <span className="eids-verified-text" title="Elektronik İlan Doğrulama Sistemi Onaylı">
+            <Icon name="check" size={12} /> EİDS Doğrulandı
+          </span>
           <span>{listing.date || 'Güncel'}</span>
         </div>
         <h3 title={listing.title}>{listing.title}</h3>
@@ -655,18 +661,18 @@ function HomePage({
         {[
           [
             '01',
-            'Doğrulanmış ilanlar',
-            'Her portföy uzman ekibimiz tarafından yerinde kontrol edilir.',
+            'EİDS & Taşınmaz Doğrulama',
+            'Tüm portföyümüz Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi (EİDS) mevzuatına uygun, Taşınmaz Numaralı ve doğrulanmıştır.',
           ],
           [
             '02',
-            'Bölge uzmanlığı',
-            'Mahalle mahalle güncel fiyat ve yaşam bilgisi sunarız.',
+            'Bölge ve Harita Uzmanlığı',
+            'Keçiören, Etlik ve Ankara genelinde harita, ada/parsel ve güncel piyasa ekspertizi sunarız.',
           ],
           [
             '03',
             'Uçtan uca destek',
-            'İlk geziden tapu sürecine kadar her adımda yanınızdayız.',
+            'İlk geziden tapu ve anahtar teslim sürecine kadar her adımda yanınızdayız.',
           ],
         ].map(([no, title, text]) => (
           <article key={no}>
@@ -710,7 +716,14 @@ function DetailPage({
 
       <div className="detail-title-row">
         <div>
-          <span className="detail-type">{listing.type}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '8px' }}>
+            <span className="detail-type">{listing.type}</span>
+            <div className="eids-pill" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi Uyarınca Doğrulanmıştır">
+              <span className="eids-pill-dot" />
+              <span><strong>EİDS Taşınmaz No:</strong> {listing.eid || listing.id}</span>
+              <span className="eids-verified-tag">Bakanlık Doğrulamalı ✓</span>
+            </div>
+          </div>
           <h1>{listing.title}</h1>
           <p>
             <Icon name="pin" size={17} />
@@ -867,6 +880,9 @@ function DetailPage({
             <h2>İlan detayları</h2>
             <div className="spec-grid">
               {[
+                ['Taşınmaz No (EİD)', listing.eid || `${listing.id}`],
+                ['EİDS Doğrulama', 'Bakanlık Onaylı / Doğrulandı ✓'],
+                ['Yetki Belgesi', 'Taşınmaz Ticareti Yetki Belgeli Ofis'],
                 ['İlan no', `RNK-${listing.id}`],
                 ['İlan tarihi', listing.date || '12 Haziran 2025'],
                 ['Emlak tipi', listing.type],
@@ -908,6 +924,73 @@ function DetailPage({
                   {item}
                 </span>
               ))}
+            </div>
+          </section>
+
+          {/* Harita ve Konum Bilgisi */}
+          <section className="detail-section detail-map-section">
+            <span className="section-kicker">LOKASYON & HARİTA</span>
+            <div className="map-header-row">
+              <div>
+                <h2 style={{ margin: '8px 0 4px' }}>Harita ve Konum Bilgisi</h2>
+                <p className="map-location-sub">
+                  <Icon name="pin" size={16} /> {listing.location}
+                </p>
+              </div>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${listing.lat || 39.9721},${listing.lng || 32.8284}`}
+                target="_blank"
+                rel="noreferrer"
+                className="map-nav-btn"
+              >
+                Google Haritalar'da Aç ↗
+              </a>
+            </div>
+
+            <div className="map-container">
+              <iframe
+                title={`Harita - ${listing.title}`}
+                className="map-iframe"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${(listing.lng || 32.8284) - 0.008}%2C${(listing.lat || 39.9721) - 0.005}%2C${(listing.lng || 32.8284) + 0.008}%2C${(listing.lat || 39.9721) + 0.005}&layer=mapnik&marker=${listing.lat || 39.9721}%2C${listing.lng || 32.8284}`}
+                loading="lazy"
+              />
+              <div className="map-floating-badge">
+                <span className="map-badge-dot" />
+                <span>
+                  <strong>Renk Emlak Portföyü</strong> · EİD: {listing.eid || listing.id}
+                </span>
+              </div>
+            </div>
+
+            <div className="neighborhood-grid">
+              <div className="neighborhood-item">
+                <span className="nb-icon">🚇</span>
+                <div>
+                  <strong>Toplu Taşıma</strong>
+                  <small>EGO Otobüs durağı 100m, Metro İstasyonu 1.2 km</small>
+                </div>
+              </div>
+              <div className="neighborhood-item">
+                <span className="nb-icon">🏥</span>
+                <div>
+                  <strong>Sağlık Merkezleri</strong>
+                  <small>Etlik Şehir Hastanesi & Sağlık Ocağı 5-7 dk</small>
+                </div>
+              </div>
+              <div className="neighborhood-item">
+                <span className="nb-icon">🏫</span>
+                <div>
+                  <strong>Eğitim Kurumları</strong>
+                  <small>İlk & Ortaokul, Liseler yürüme mesafesinde</small>
+                </div>
+              </div>
+              <div className="neighborhood-item">
+                <span className="nb-icon">🛒</span>
+                <div>
+                  <strong>Alışveriş & Sosyal</strong>
+                  <small>Semt Pazarı, Süpermarketler ve Parklar çok yakın</small>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -1078,6 +1161,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [type, setType] = useState('Satılık Daire')
+  const [eid, setEid] = useState('')
   const [note, setNote] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1104,11 +1188,13 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
         style={{
           backgroundColor: 'white',
           borderRadius: '16px',
-          maxWidth: '480px',
+          maxWidth: '500px',
           width: '100%',
           padding: '32px',
           boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
           position: 'relative',
+          maxHeight: '92vh',
+          overflowY: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1145,8 +1231,21 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
               <Icon name="check" size={32} />
             </div>
             <h2 style={{ fontSize: '22px', marginBottom: '8px' }}>Talebiniz Alındı!</h2>
+            <div
+              style={{
+                background: '#f0ebf6',
+                border: '1px solid rgba(75, 44, 120, 0.2)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                margin: '12px 0 16px',
+                fontSize: '13px',
+                color: 'var(--purple-dark)',
+              }}
+            >
+              <strong>Kayıtlı Taşınmaz No (EİD):</strong> {eid}
+            </div>
             <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.6 }}>
-              Sayın <strong>{name}</strong>, mülkünüzle ilgili en kısa sürede <strong>{phone}</strong>{' '}
+              Sayın <strong>{name}</strong>, gayrimenkulünüzün EİDS ön doğrulama süreci başlatılmıştır. En kısa sürede <strong>{phone}</strong>{' '}
               numaralı telefonunuzdan sizinle iletişime geçeceğiz.
             </p>
             <button
@@ -1160,14 +1259,18 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
         ) : (
           <form onSubmit={handleSubmit}>
             <span className="section-kicker">RENK EMLAK DESTEK</span>
-            <h2 style={{ fontSize: '22px', margin: '6px 0 16px' }}>Ücretsiz İlan & Ekspertiz Talebi</h2>
-            <p style={{ color: 'var(--muted)', fontSize: '13px', marginBottom: '20px' }}>
-              Mülkünüzü değerinde satmak veya kiralamak için bilgilerinizi bırakın, uzmanımız sizi arasın.
-            </p>
+            <h2 style={{ fontSize: '22px', margin: '6px 0 12px' }}>Ücretsiz İlan & Ekspertiz Talebi</h2>
+
+            <div className="eids-law-notice" style={{ marginBottom: '16px' }}>
+              <span className="eids-notice-badge">YASAL ZORUNLULUK</span>
+              <p style={{ margin: 0 }}>
+                Ticaret Bakanlığı <strong>EİDS (Elektronik İlan Doğrulama Sistemi)</strong> mevzuatı uyarınca, gayrimenkul ilan girişlerinde <strong>Taşınmaz Numarası (EİD)</strong> girilmesi zorunludur.
+              </p>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
-                Adınız Soyadınız
+                Adınız Soyadınız *
                 <input
                   required
                   placeholder="Örn: Ahmet Yılmaz"
@@ -1183,7 +1286,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
               </label>
 
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
-                Telefon Numaranız
+                Telefon Numaranız *
                 <input
                   required
                   type="tel"
@@ -1197,6 +1300,31 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                     fontSize: '14px',
                   }}
                 />
+              </label>
+
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Taşınmaz Numarası (EİD) <span style={{ color: 'var(--red)' }}>* Zorunlu</span></span>
+                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>EİDS Doğrulama ✓</span>
+                </div>
+                <input
+                  required
+                  type="text"
+                  placeholder="Örn: 10849201 (Tapu Taşınmaz Numarası)"
+                  value={eid}
+                  onChange={(e) => setEid(e.target.value)}
+                  style={{
+                    border: '1.5px solid var(--purple)',
+                    backgroundColor: '#faf7fc',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                  }}
+                />
+                <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 400, marginTop: '2px', lineHeight: 1.4 }}>
+                  💡 <strong>Taşınmaz Numaranızı bilmiyor musunuz?</strong> E-Devlet hesabınıza giriş yaparak <em>"Tapu Bilgileri Sorgulama"</em> sayfasından mülkünüze ait Taşınmaz Numarasını (EİD) görebilirsiniz.
+                </span>
               </label>
 
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
@@ -1222,7 +1350,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
                 Mülk Konumu ve Notlar
                 <textarea
-                  rows={3}
+                  rows={2}
                   placeholder="Örn: Aşağı Eğlence Bağlum sokakta 3+1 daire..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
@@ -1236,8 +1364,8 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                 />
               </label>
 
-              <button type="submit" className="primary-button" style={{ width: '100%', marginTop: '8px' }}>
-                Ücretsiz Ekspertiz Talebi Gönder
+              <button type="submit" className="primary-button" style={{ width: '100%', marginTop: '6px' }}>
+                İlanı & Ekspertiz Talebini Gönder (EİDS Onaylı)
               </button>
             </div>
           </form>

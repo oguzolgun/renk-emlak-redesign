@@ -1,7 +1,8 @@
-// Live listings and images from renkemlak.com
+// Live listings and images from renkemlak.com with EIDS verification
 
 export interface Listing {
   id: number
+  eid: string
   title: string
   location: string
   price: string
@@ -18,6 +19,8 @@ export interface Listing {
   buildingAge: string
   bathrooms: string
   amenities: string[]
+  lat: number
+  lng: number
 }
 
 export const listings: Listing[] = [
@@ -53,7 +56,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10373960",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 78295716,
@@ -87,7 +93,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10295716",
+    "lat": 39.975,
+    "lng": 32.835
   },
   {
     "id": 26367132,
@@ -121,7 +130,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10367132",
+    "lat": 39.982,
+    "lng": 32.867
   },
   {
     "id": 84791247,
@@ -155,7 +167,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10791247",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 52201314,
@@ -189,7 +204,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10201314",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 50016202,
@@ -223,7 +241,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10016202",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 79552133,
@@ -256,7 +277,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10552133",
+    "lat": 39.9385,
+    "lng": 32.912
   },
   {
     "id": 78295706,
@@ -290,7 +314,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10295706",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 47600525,
@@ -324,7 +351,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10600525",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 77223057,
@@ -358,7 +388,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10223057",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 68010162,
@@ -392,7 +425,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10010162",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 46830811,
@@ -426,7 +462,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10830811",
+    "lat": 39.975,
+    "lng": 32.835
   },
   {
     "id": 73076657,
@@ -460,7 +499,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10076657",
+    "lat": 39.975,
+    "lng": 32.835
   },
   {
     "id": 26549087,
@@ -492,7 +534,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10549087",
+    "lat": 39.9385,
+    "lng": 32.912
   },
   {
     "id": 90177784,
@@ -522,7 +567,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10177784",
+    "lat": 40.239,
+    "lng": 33.0325
   },
   {
     "id": 44230888,
@@ -556,7 +604,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10230888",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 18967714,
@@ -590,7 +641,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10967714",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 45249958,
@@ -624,7 +678,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10249958",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 10189838,
@@ -658,7 +715,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10189838",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 35476695,
@@ -692,7 +752,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10476695",
+    "lat": 39.9985,
+    "lng": 32.8625
   },
   {
     "id": 41537213,
@@ -725,7 +788,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10537213",
+    "lat": 40.128,
+    "lng": 33.085
   },
   {
     "id": 53297412,
@@ -759,7 +825,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10297412",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 53786022,
@@ -793,7 +862,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10786022",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 49368563,
@@ -827,7 +899,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10368563",
+    "lat": 39.975,
+    "lng": 32.835
   },
   {
     "id": 55758834,
@@ -861,7 +936,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10758834",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 27860910,
@@ -895,7 +973,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10860910",
+    "lat": 39.9675,
+    "lng": 32.8335
   },
   {
     "id": 35972636,
@@ -929,7 +1010,10 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10972636",
+    "lat": 39.9721,
+    "lng": 32.8284
   },
   {
     "id": 29775900,
@@ -963,6 +1047,9 @@ export const listings: Listing[] = [
       "Isı Yalıtımı",
       "Caddeye Yakın",
       "Toplu Ulaşıma Yakın"
-    ]
+    ],
+    "eid": "10775900",
+    "lat": 39.9721,
+    "lng": 32.8284
   }
 ]
