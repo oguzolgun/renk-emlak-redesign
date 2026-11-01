@@ -1525,12 +1525,14 @@ function DetailPage({
                 <tr className="spec-eid-row">
                   <th>Taşınmaz No (EİD)</th>
                   <td>
-                    <span className="spec-eid-badge">
-                      {listing.eid}
-                    </span>
-                    <span className="spec-eid-verified" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi">
-                      <Icon name="check" size={11} /> EİDS Onaylı
-                    </span>
+                    <div className="spec-eid-cell">
+                      <span className="spec-eid-badge">
+                        {listing.eid}
+                      </span>
+                      <span className="spec-eid-verified" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi">
+                        <Icon name="check" size={11} /> EİDS Onaylı
+                      </span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
