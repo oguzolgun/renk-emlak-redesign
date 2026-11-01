@@ -22,6 +22,11 @@ const Icon = ({
     | 'whatsapp'
     | 'close'
     | 'menu'
+    | 'print'
+    | 'compass'
+    | 'chart'
+    | 'layers'
+    | 'fullscreen'
   size?: number
 }) => {
   const paths: Record<typeof name, ReactNode> = {
@@ -95,6 +100,38 @@ const Icon = ({
     ),
     close: <path d="M18 6 6 18M6 6l12 12" />,
     menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+    print: (
+      <>
+        <path d="M6 9V2h12v7" />
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+        <rect x="6" y="14" width="12" height="8" rx="1" />
+      </>
+    ),
+    compass: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      </>
+    ),
+    chart: (
+      <>
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </>
+    ),
+    layers: (
+      <>
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+      </>
+    ),
+    fullscreen: (
+      <>
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+      </>
+    ),
   }
   return (
     <svg
@@ -225,22 +262,54 @@ function Hero({ onExplore }: { onExplore: () => void }) {
       if (!hero) return
       const rect = hero.getBoundingClientRect()
       const distance = hero.clientHeight - window.innerHeight
-      setProgress(Math.min(1, Math.max(0, -rect.top / Math.max(distance, 1))))
+      // Smooth eased progression over long 300vh scroll
+      const raw = Math.min(1, Math.max(0, -rect.top / Math.max(distance, 1)))
+      setProgress(raw)
     }
     update()
     window.addEventListener('scroll', update, { passive: true })
     return () => window.removeEventListener('scroll', update)
   }, [])
 
+  const handlePointerAction = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.buttons === 1) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
+      setProgress(ratio)
+    }
+  }
+
   return (
     <section className="hero-scroll">
-      <div className="hero-sticky">
+      <div
+        className="hero-sticky"
+        onPointerDown={handlePointerAction}
+        onPointerMove={handlePointerAction}
+        style={{ cursor: 'ew-resize' }}
+      >
         <div className="hero-image hero-muted" />
         <div
           className="hero-image hero-color"
           style={{ clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }}
         />
         <div className="hero-shade" />
+
+        {/* Floating Indicator Badges */}
+        <div className="hero-badge-left">⚪ SİYAH & BEYAZ</div>
+        <div className="hero-badge-right">✨ CANLI RENKLER</div>
+
+        {/* Dynamic Split Line & Glowing Handle */}
+        <div
+          className="hero-split-line"
+          style={{ left: `${Math.min(99.5, Math.max(0.5, progress * 100))}%` }}
+        >
+          <div className="hero-split-handle">
+            <span>◀</span>
+            <span>{progress < 0.05 ? 'KAYDIRIN' : `%${Math.round(progress * 100)} CANLILIK`}</span>
+            <span>▶</span>
+          </div>
+        </div>
+
         <div className="hero-content">
           <p className="eyebrow">
             <span /> Hayalinizdeki yaşam burada başlar
@@ -253,21 +322,23 @@ function Hero({ onExplore }: { onExplore: () => void }) {
           <p className="hero-copy">
             Doğru evi bulmak bir aramadan fazlası.
             <br />
-            Size iyi hissettirecek yaşamı birlikte keşfedelim.
+            Yavaşça aşağı kaydırın, evinizin gerçek renkleriyle canlandığını izleyin.
           </p>
           <button className="hero-cta" onClick={onExplore}>
-            İlanları keşfet <Icon name="arrow" />
+            İlanları Keşfet <Icon name="arrow" />
           </button>
         </div>
+
         <div className="color-meter">
-          <span>SADELİK</span>
+          <span>SİYAH-BEYAZ</span>
           <div>
-            <i style={{ height: `${Math.max(8, progress * 100)}%` }} />
+            <i style={{ height: `${Math.max(6, progress * 100)}%` }} />
           </div>
-          <span>RENK</span>
+          <span>% {Math.round(progress * 100)}</span>
         </div>
+
         <div className="scroll-cue">
-          <span>Kaydırdıkça renklensin</span>
+          <span>Aşağı kaydırdıkça renklenir (veya sağa sürükleyin)</span>
           <b>
             <i />
           </b>
@@ -691,46 +762,139 @@ function DetailPage({
   onBack,
   isSaved,
   onToggleSave,
+  onOpenConsultation,
 }: {
   listing: Listing
   onBack: () => void
   isSaved: boolean
   onToggleSave: (id: number) => void
+  onOpenConsultation: () => void
 }) {
   const images = listing.images && listing.images.length > 0 ? listing.images : [listing.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [activeTab, setActiveTab] = useState<'details' | 'location' | 'index'>('details')
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+
+  // Location tab states
+  const [showM2Map, setShowM2Map] = useState(false)
+  const [mapType, setMapType] = useState<'normal' | 'satellite'>('normal')
+  const [nearbyCat, setNearbyCat] = useState<'ulasim' | 'egitim' | 'saglik' | 'yesil' | 'alisveris'>('ulasim')
+
+  // Emlak Endeksi tab states
+  const [endeksDuration, setEndeksDuration] = useState<'1' | '2' | '4'>('1')
+  const [endeksCurrency, setEndeksCurrency] = useState<'TL' | 'TL_REEL' | 'USD' | 'EUR'>('TL')
+  const [hoveredMonthIdx, setHoveredMonthIdx] = useState<number | null>(null)
 
   const whatsappMessage = encodeURIComponent(
-    `Merhaba Mesut Bey, renkemlak.com üzerinden "RNK-${listing.id} / ${listing.title}" ilanınız hakkında bilgi alabilir miyim?`
+    `Merhaba Mesut Bey, renkemlak.com üzerinden "${listing.title}" (İlan No: RNK-${listing.id}, EİD: ${listing.eid}) portföyünüz hakkında detaylı bilgi ve randevu alabilir miyim?`
   )
+
+  const nearbyPlaces: Record<string, { icon: string; title: string; dist: string; desc: string }[]> = {
+    ulasim: [
+      { icon: '🚌', title: 'EGO Otobüs Durağı', dist: '120 m', desc: 'Yürüme 1-2 dk · Hatlar: 260, 261, 263' },
+      { icon: '🚐', title: 'Etlik - Ulus - Sıhhiye Dolmuş Hattı', dist: '150 m', desc: 'Yürüme 2 dk · 3 dakikada bir sefer' },
+      { icon: '🚇', title: 'Keçiören Metro İstasyonu', dist: '1.2 km', desc: 'Araçla 3 dk · Ring otobüsü geçer' },
+      { icon: '🛣️', title: 'Ankara Çevre Yolu & Anadolu Bulvarı', dist: '2.5 km', desc: 'Araçla 5 dk hızlı ana aks bağlantısı' },
+    ],
+    egitim: [
+      { icon: '🏫', title: 'Yalçın Eskiyapan İlkokulu', dist: '250 m', desc: 'Yürüme 3 dk · Köklü devlet okulu' },
+      { icon: '🎓', title: 'Etlik Anadolu Lisesi', dist: '550 m', desc: 'Yürüme 7 dk · Başarılı eğitim kadrosu' },
+      { icon: '👶', title: 'Keçiören Belediyesi Gündüz Bakımevi & Kreş', dist: '180 m', desc: 'Yürüme 2 dk' },
+      { icon: '🏛️', title: 'Gülhane Sağlık Bilimleri Üniversitesi', dist: '1.4 km', desc: 'Araçla 4 dk / Otobüsle 8 dk' },
+    ],
+    saglik: [
+      { icon: '🏥', title: 'Etlik Şehir Hastanesi', dist: '1.1 km', desc: 'Araçla 4 dk · Türkiye’nin en büyük hastanelerinden biri' },
+      { icon: '🩺', title: 'Aşağı Eğlence Aile Sağlığı Merkezi', dist: '350 m', desc: 'Yürüme 4 dk · Aile hekimliği ve aşı merkezi' },
+      { icon: '💊', title: 'Nöbetçi Eczaneler & Medikal', dist: '90 m', desc: 'Yürüme 1 dk · Cadde üzerinde 4 eczane' },
+      { icon: '🚑', title: 'Gülhane Eğitim ve Araştırma Hastanesi (GATA)', dist: '1.8 km', desc: 'Araçla 6 dk' },
+    ],
+    yesil: [
+      { icon: '🌳', title: 'Yunus Emre Parkı & Koşu Parkuru', dist: '200 m', desc: 'Yürüme 2 dk · Çocuk parkı ve yeşil alan' },
+      { icon: '⛲', title: 'Keçiören Şelale & Botanik Parkı', dist: '1.5 km', desc: 'Araçla 5 dk · Aile rekreasyon alanı' },
+      { icon: '⚽', title: 'Keçiören Belediyesi Kapalı Spor Kompleksi & Havuz', dist: '600 m', desc: 'Yürüme 8 dk' },
+      { icon: '🌲', title: 'Kartaltepe Kent Ormanı', dist: '3.2 km', desc: 'Araçla 8 dk mesire alanı' },
+    ],
+    alisveris: [
+      { icon: '🛒', title: 'Aşağı Eğlence Kapalı Semt Pazarı', dist: '280 m', desc: 'Salı & Cumartesi günleri taze pazar' },
+      { icon: '🏬', title: 'Antares AVM & Yaşam Merkezi', dist: '1.8 km', desc: 'Araçla 5 dk · Sinema, eğlence, mağazalar' },
+      { icon: '🍞', title: 'Zincir Marketler (Migros, Bim, A101, Şok, Fırın)', dist: '80 m', desc: 'Apartmanın hemen karşısında' },
+      { icon: '☕', title: 'Giresun Caddesi Kafe ve Restoranlar', dist: '350 m', desc: 'Sosyal yaşam aksı' },
+    ],
+  }
+
+  // Endeks calculations
+  const trend = listing.m2PriceTrend || []
+  const prices = trend.map((t) => t.price)
+  const districtPrices = trend.map((t) => t.districtPrice)
+  const cityPrices = trend.map((t) => t.cityPrice)
+
+  const minVal = Math.floor(Math.min(...cityPrices, 20000) * 0.9 / 5000) * 5000
+  const maxVal = Math.ceil(Math.max(...prices, 60000) * 1.1 / 5000) * 5000
+  const range = maxVal - minVal || 1
+
+  const svgW = 740
+  const svgH = 240
+  const padL = 65
+  const padR = 30
+  const padT = 20
+  const padB = 35
+  const chartW = svgW - padL - padR
+  const chartH = svgH - padT - padB
+
+  const getX = (idx: number) => padL + (idx / Math.max(1, trend.length - 1)) * chartW
+  const getY = (val: number) => padT + chartH - ((val - minVal) / range) * chartH
+
+  const neighborhoodPath = trend
+    .map((t, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx).toFixed(1)} ${getY(t.price).toFixed(1)}`)
+    .join(' ')
+  const neighborhoodArea = `${neighborhoodPath} L ${getX(trend.length - 1).toFixed(1)} ${padT + chartH} L ${getX(0).toFixed(1)} ${padT + chartH} Z`
+  const districtPath = trend
+    .map((t, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx).toFixed(1)} ${getY(t.districtPrice).toFixed(1)}`)
+    .join(' ')
+  const cityPath = trend
+    .map((t, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx).toFixed(1)} ${getY(t.cityPrice).toFixed(1)}`)
+    .join(' ')
+
+  const scrollToTabs = (tab: 'details' | 'location' | 'index') => {
+    setActiveTab(tab)
+    document.querySelector('.detail-tabs-section')?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <main className="detail-page">
+      {/* Breadcrumb Navigation */}
       <div className="breadcrumbs">
         <button onClick={onBack}>Ana Sayfa</button>
-        <Icon name="chevron" size={14} />
-        <span>{listing.type}</span>
-        <Icon name="chevron" size={14} />
-        <span>{listing.location}</span>
+        <Icon name="chevron" size={13} />
+        <span>Emlak</span>
+        <Icon name="chevron" size={13} />
+        <span>Konut</span>
+        <Icon name="chevron" size={13} />
+        <button onClick={onBack}>{listing.type}</button>
+        <Icon name="chevron" size={13} />
+        <span>{listing.city}</span>
+        <Icon name="chevron" size={13} />
+        <span>{listing.district}</span>
+        <Icon name="chevron" size={13} />
+        <span>{listing.neighborhood}</span>
       </div>
 
+      {/* Header Row: Title & Actions */}
       <div className="detail-title-row">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '8px' }}>
-            <span className="detail-type">{listing.type}</span>
-            <div className="eids-pill" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi Uyarınca Doğrulanmıştır">
-              <span className="eids-pill-dot" />
-              <span><strong>EİDS Taşınmaz No:</strong> {listing.eid || listing.id}</span>
-              <span className="eids-verified-tag">Bakanlık Doğrulamalı ✓</span>
-            </div>
-          </div>
           <h1>{listing.title}</h1>
-          <p>
-            <Icon name="pin" size={17} />
-            {listing.location}
+          <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="pin" size={15} />
+            {listing.city} / {listing.district} / {listing.neighborhood}
           </p>
         </div>
         <div className="detail-actions">
+          <button onClick={() => onToggleSave(listing.id)} style={{ color: isSaved ? 'var(--red)' : undefined }}>
+            <Icon name="heart" size={16} /> {isSaved ? 'Favorilerimde' : 'Favorilerime Ekle'}
+          </button>
+          <button onClick={() => window.print()} title="İlanı Yazdır">
+            <Icon name="print" size={16} /> Yazdır
+          </button>
           <button
             onClick={() => {
               if (navigator.share) {
@@ -741,303 +905,660 @@ function DetailPage({
               }
             }}
           >
-            <Icon name="share" /> Paylaş
-          </button>
-          <button
-            onClick={() => onToggleSave(listing.id)}
-            style={{ color: isSaved ? 'var(--red)' : undefined }}
-          >
-            <Icon name="heart" /> {isSaved ? 'Kaydedildi' : 'Kaydet'}
+            <Icon name="share" size={16} /> Paylaş
           </button>
         </div>
       </div>
 
-      {/* Main Image Showcase */}
-      <div style={{ marginBottom: '24px' }}>
+      {/* 2-Column Sahibinden Style Showcase */}
+      <div className="sahibinden-top-grid">
+        {/* Left Column: Gallery */}
+        <div className="sahibinden-gallery">
+          <div className="gallery-main-frame">
+            <img
+              src={images[activeImageIndex]}
+              alt={listing.title}
+              onClick={() => setIsLightboxOpen(true)}
+            />
+            {images.length > 1 && (
+              <>
+                <button
+                  className="gallery-nav-btn gallery-nav-prev"
+                  onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
+                  aria-label="Önceki fotoğraf"
+                >
+                  ‹
+                </button>
+                <button
+                  className="gallery-nav-btn gallery-nav-next"
+                  onClick={() => setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
+                  aria-label="Sonraki fotoğraf"
+                >
+                  ›
+                </button>
+              </>
+            )}
+            <div className="gallery-counter-badge">
+              {activeImageIndex + 1} / {images.length} Fotoğraf
+            </div>
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className="gallery-action-bar">
+            <button onClick={() => setIsLightboxOpen(true)}>
+              <Icon name="fullscreen" size={15} /> Büyük Fotoğraf
+            </button>
+            <button onClick={() => scrollToTabs('location')}>
+              <Icon name="compass" size={15} /> Harita & Konum
+            </button>
+            <button onClick={() => scrollToTabs('index')}>
+              <Icon name="chart" size={15} /> Emlak Endeksi
+            </button>
+          </div>
+
+          {/* Thumbnails Row */}
+          {images.length > 1 && (
+            <div className="gallery-thumbs-row">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  className={`gallery-thumb-item ${activeImageIndex === idx ? 'active' : ''}`}
+                  onClick={() => setActiveImageIndex(idx)}
+                >
+                  <img src={img} alt={`Fotoğraf ${idx + 1}`} />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Sub Navigation Links */}
+          <div className="gallery-sub-links">
+            <button onClick={() => scrollToTabs('index')}>📈 Emlak Endeksi</button>
+            <span>|</span>
+            <button onClick={onOpenConsultation}>📑 Gayrimenkul Ekspertiz</button>
+            <span>|</span>
+            <button onClick={() => scrollToTabs('location')}>📍 Bölge Rehberi</button>
+          </div>
+        </div>
+
+        {/* Right Column: Price, Agent & Specs Table */}
+        <div className="sahibinden-info-col">
+          <div className="sahibinden-price-card">
+            <div>
+              <strong>{listing.price}</strong>
+              <div className="sahibinden-location-sub">
+                {listing.city} / {listing.district} / {listing.neighborhood}
+              </div>
+            </div>
+            <button
+              onClick={onOpenConsultation}
+              style={{
+                border: '1px solid #cbd5e1',
+                background: '#f8fafc',
+                color: '#2563eb',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Kredi & Ekspertiz Teklifi
+            </button>
+          </div>
+
+          {/* Danışman Kartı */}
+          <div className="sahibinden-agent-card">
+            <img src="/renk-emlak-logo.png" alt="Renk Emlak" className="agent-brand-logo" />
+            <div className="agent-details">
+              <strong>Mesut KAYA</strong>
+              <span>Gayrimenkul Portföy Danışmanı</span>
+              <span style={{ color: '#059669', fontWeight: 600 }}>Yetki Belge No: 0600124</span>
+            </div>
+            <div className="agent-quick-actions">
+              <a href="tel:03123521515" className="agent-phone-btn">
+                <Icon name="phone" size={14} /> 0 (312) 352 15 15
+              </a>
+              <a
+                href={`https://wa.me/905423521515?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noreferrer"
+                className="agent-wa-btn"
+              >
+                <Icon name="whatsapp" size={14} /> WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* Sahibinden Specification Table */}
+          <div className="sahibinden-table-wrap">
+            <table className="sahibinden-spec-table">
+              <tbody>
+                <tr>
+                  <th>İlan No</th>
+                  <td style={{ color: 'var(--red)', fontWeight: 700 }}>RNK-{listing.id}</td>
+                </tr>
+                <tr className="spec-eid-row">
+                  <th>Taşınmaz No (EİD)</th>
+                  <td>
+                    <span className="spec-eid-badge">
+                      {listing.eid}
+                    </span>
+                    <span className="spec-eid-verified" title="Ticaret Bakanlığı Elektronik İlan Doğrulama Sistemi">
+                      ✓ EİDS Onaylı
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>İlan Tarihi</th>
+                  <td>{listing.date}</td>
+                </tr>
+                <tr>
+                  <th>Emlak Tipi</th>
+                  <td>{listing.type}</td>
+                </tr>
+                <tr>
+                  <th>m² (Brüt)</th>
+                  <td>{listing.area}</td>
+                </tr>
+                <tr>
+                  <th>m² (Net)</th>
+                  <td>{listing.netArea}</td>
+                </tr>
+                <tr>
+                  <th>Oda Sayısı</th>
+                  <td>{listing.room}</td>
+                </tr>
+                <tr>
+                  <th>Bina Yaşı</th>
+                  <td>{listing.buildingAge}</td>
+                </tr>
+                <tr>
+                  <th>Kat Sayısı</th>
+                  <td>{listing.totalFloors}</td>
+                </tr>
+                <tr>
+                  <th>Bulunduğu Kat</th>
+                  <td>{listing.floor}</td>
+                </tr>
+                <tr>
+                  <th>Isıtma</th>
+                  <td>{listing.heating}</td>
+                </tr>
+                <tr>
+                  <th>Banyo Sayısı</th>
+                  <td>{listing.bathrooms}</td>
+                </tr>
+                <tr>
+                  <th>Mutfak</th>
+                  <td>{listing.kitchen}</td>
+                </tr>
+                <tr>
+                  <th>Balkon</th>
+                  <td>{listing.balcony}</td>
+                </tr>
+                <tr>
+                  <th>Asansör</th>
+                  <td>{listing.elevator}</td>
+                </tr>
+                <tr>
+                  <th>Otopark</th>
+                  <td>{listing.parking}</td>
+                </tr>
+                <tr>
+                  <th>Eşyalı</th>
+                  <td>{listing.furnished}</td>
+                </tr>
+                <tr>
+                  <th>Kullanım Durumu</th>
+                  <td>{listing.status}</td>
+                </tr>
+                <tr>
+                  <th>Site İçerisinde</th>
+                  <td>{listing.inSite}</td>
+                </tr>
+                <tr>
+                  <th>Site Adı</th>
+                  <td>{listing.siteName}</td>
+                </tr>
+                <tr>
+                  <th>Aidat (TL)</th>
+                  <td>{listing.dues}</td>
+                </tr>
+                <tr>
+                  <th>Krediye Uygun</th>
+                  <td>{listing.eligibleForLoan}</td>
+                </tr>
+                <tr>
+                  <th>Enerji Kimlik Belgesi</th>
+                  <td>{listing.energyRating}</td>
+                </tr>
+                <tr>
+                  <th>Tapu Durumu</th>
+                  <td>{listing.deedStatus}</td>
+                </tr>
+                <tr>
+                  <th>Kimden</th>
+                  <td>{listing.fromWho}</td>
+                </tr>
+                <tr>
+                  <th>Takas</th>
+                  <td>{listing.exchange}</td>
+                </tr>
+                <tr>
+                  <th>Yetki Belge No</th>
+                  <td>{listing.authCertNo}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* 3 Detail Tabs: İlan Detayları | Konumu ve Bölge Bilgisi | Emlak Endeksi */}
+      <section className="detail-tabs-section">
+        <div className="detail-tabs-nav" role="tablist">
+          <button
+            className={`detail-tab-btn ${activeTab === 'details' ? 'active' : ''}`}
+            onClick={() => setActiveTab('details')}
+            role="tab"
+            aria-selected={activeTab === 'details'}
+          >
+            İlan Detayları
+          </button>
+          <button
+            className={`detail-tab-btn ${activeTab === 'location' ? 'active' : ''}`}
+            onClick={() => setActiveTab('location')}
+            role="tab"
+            aria-selected={activeTab === 'location'}
+          >
+            Konumu ve Bölge Bilgisi
+          </button>
+          <button
+            className={`detail-tab-btn ${activeTab === 'index' ? 'active' : ''}`}
+            onClick={() => setActiveTab('index')}
+            role="tab"
+            aria-selected={activeTab === 'index'}
+          >
+            Emlak Endeksi
+          </button>
+        </div>
+
+        <div className="detail-tab-pane">
+          {/* TAB 1: İLAN DETAYLARI & AÇIKLAMA */}
+          {activeTab === 'details' && (
+            <div>
+              <div className="tab-section-block">
+                <div className="tab-section-title">
+                  <span>Açıklama</span>
+                </div>
+                <div className="tab-desc-text">
+                  {listing.description}
+                  {'\n\n'}
+                  <strong>Renk Emlak Güvencesiyle:</strong> Bu gayrimenkulün tüm tapu, imar, ada/parsel ve iskan kontrolleri uzman danışmanlarımız tarafından yerinde yapılmış olup Ticaret Bakanlığı EİDS (Elektronik İlan Doğrulama Sistemi) uyarınca <strong>{listing.eid}</strong> numarası ile yetkilendirilmiştir.
+                </div>
+              </div>
+
+              {/* İç Özellikler */}
+              <div className="tab-section-block">
+                <div className="tab-section-title">
+                  <span>İç Özellikler</span>
+                </div>
+                <div className="tab-features-grid">
+                  {listing.interiorFeatures.map((feat) => (
+                    <div key={feat} className="tab-feature-item">
+                      <span className="tab-feature-check">✓</span>
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dış Özellikler */}
+              <div className="tab-section-block">
+                <div className="tab-section-title">
+                  <span>Dış Özellikler</span>
+                </div>
+                <div className="tab-features-grid">
+                  {listing.exteriorFeatures.map((feat) => (
+                    <div key={feat} className="tab-feature-item">
+                      <span className="tab-feature-check">✓</span>
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Muhit ve Konum Özellikleri */}
+              <div className="tab-section-block">
+                <div className="tab-section-title">
+                  <span>Muhit & Ulaşım Özellikleri</span>
+                </div>
+                <div className="tab-features-grid">
+                  {listing.neighborhoodFeatures.map((feat) => (
+                    <div key={feat} className="tab-feature-item">
+                      <span className="tab-feature-check">✓</span>
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: KONUMU VE BÖLGE BİLGİSİ */}
+          {activeTab === 'location' && (
+            <div>
+              <div className="location-top-bar">
+                <div className="location-bar-left">
+                  <button
+                    className={`m2-toggle-btn ${showM2Map ? 'active' : ''}`}
+                    onClick={() => setShowM2Map(!showM2Map)}
+                  >
+                    <span>m² Fiyat haritası</span>
+                    <span className="m2-tag-new">Yeni</span>
+                  </button>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${listing.lat},${listing.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="how-to-go-btn"
+                  >
+                    <Icon name="compass" size={15} /> Nasıl Giderim?
+                  </a>
+                </div>
+                <div className="map-view-toggle">
+                  <button
+                    className={mapType === 'normal' ? 'active' : ''}
+                    onClick={() => setMapType('normal')}
+                  >
+                    Harita
+                  </button>
+                  <button
+                    className={mapType === 'satellite' ? 'active' : ''}
+                    onClick={() => setMapType('satellite')}
+                  >
+                    Uydu
+                  </button>
+                </div>
+              </div>
+
+              {showM2Map && (
+                <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', fontSize: '13px', color: '#92400e' }}>
+                  📍 <strong>{listing.neighborhood}</strong> ortalama metrekare satış fiyatı: <strong>₺{listing.pricePerM2.toLocaleString('tr-TR')} / m²</strong>. Bölge değer artış trendinde öncü konumdadır.
+                </div>
+              )}
+
+              {/* Interactive OpenStreetMap Frame */}
+              <iframe
+                title={`Harita - ${listing.title}`}
+                className="tab-map-frame"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${listing.lng - 0.007}%2C${listing.lat - 0.004}%2C${listing.lng + 0.007}%2C${listing.lat + 0.004}&layer=mapnik&marker=${listing.lat}%2C${listing.lng}`}
+                loading="lazy"
+              />
+
+              {/* Yakın Çevre Bilgisi */}
+              <div className="nearby-section">
+                <h3>Yakın çevre bilgisi</h3>
+                <div className="nearby-category-pills">
+                  {[
+                    ['ulasim', 'Ulaşım'],
+                    ['egitim', 'Eğitim'],
+                    ['saglik', 'Sağlık'],
+                    ['yesil', 'Yeşil Alan / Spor Tesisleri'],
+                    ['alisveris', 'Alışveriş'],
+                  ].map(([key, label]) => (
+                    <button
+                      key={key}
+                      className={`nearby-pill-btn ${nearbyCat === key ? 'active' : ''}`}
+                      onClick={() => setNearbyCat(key as typeof nearbyCat)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="nearby-items-grid">
+                  {(nearbyPlaces[nearbyCat] || nearbyPlaces.ulasim).map((item, idx) => (
+                    <div key={idx} className="nearby-item-card">
+                      <span className="nearby-item-icon">{item.icon}</span>
+                      <div className="nearby-item-info">
+                        <strong>{item.title} · <span style={{ color: '#2563eb' }}>{item.dist}</span></strong>
+                        <span>{item.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: EMLAK ENDEKSİ */}
+          {activeTab === 'index' && (
+            <div className="emlak-endeksi-container">
+              <div className="endeks-header-row">
+                <h2>{listing.type.includes('Kira') ? 'Kiralık' : 'Satılık'} Konut Metrekare Fiyatı</h2>
+                <div className="endeks-filter-group">
+                  <div className="duration-pills">
+                    {(['1', '2', '4'] as const).map((d) => (
+                      <button
+                        key={d}
+                        className={endeksDuration === d ? 'active' : ''}
+                        onClick={() => setEndeksDuration(d)}
+                      >
+                        {d} yıl
+                      </button>
+                    ))}
+                  </div>
+                  <div className="currency-pills">
+                    {(['TL', 'TL_REEL', 'USD', 'EUR'] as const).map((c) => (
+                      <button
+                        key={c}
+                        className={endeksCurrency === c ? 'active' : ''}
+                        onClick={() => setEndeksCurrency(c)}
+                      >
+                        {c === 'TL_REEL' ? 'TL Reel Fiyat' : c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="endeks-summary-cards">
+                <div className="endeks-stat-card">
+                  <div className="stat-card-label">
+                    <span>🧮 EYLÜL 2026 ORTALAMASI</span>
+                  </div>
+                  <div className="stat-card-value">
+                    ₺{listing.pricePerM2.toLocaleString('tr-TR')} TL <span style={{ fontSize: '16px', color: '#64748b' }}>/ m²</span>
+                  </div>
+                </div>
+                <div className="endeks-stat-card">
+                  <div className="stat-card-label">
+                    <span>📈 1 YILLIK DEĞİŞİM</span>
+                  </div>
+                  <div className="stat-card-value">
+                    <span className="stat-growth-tag">
+                      {listing.yearlyChange} ↗
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Legend */}
+              <div className="endeks-legend-row">
+                <span>
+                  <span className="legend-dot legend-ankara" /> Ankara Geneli (Ort. ₺45.400 / m²)
+                </span>
+                <span>
+                  <span className="legend-dot legend-kecioren" /> Keçiören (Ort. ₺49.600 / m²)
+                </span>
+                <span>
+                  <span className="legend-dot legend-mahalle" /> {listing.neighborhood} (₺{listing.pricePerM2.toLocaleString('tr-TR')} / m²)
+                </span>
+              </div>
+
+              {/* Interactive SVG Chart */}
+              <div className="endeks-chart-container">
+                <svg viewBox={`0 0 ${svgW} ${svgH}`} className="endeks-chart-svg">
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.32" />
+                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.01" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal Grid lines */}
+                  {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => {
+                    const y = padT + chartH * pct
+                    const val = Math.round(maxVal - pct * range)
+                    return (
+                      <g key={i}>
+                        <line x1={padL} y1={y} x2={svgW - padR} y2={y} stroke="#e2e8f0" strokeDasharray="4 4" />
+                        <text x={padL - 10} y={y + 4} textAnchor="end" fontSize="11" fill="#94a3b8" fontFamily="DM Sans">
+                          ₺{val.toLocaleString('tr-TR')}
+                        </text>
+                      </g>
+                    )
+                  })}
+
+                  {/* Shaded Area under Neighborhood Curve */}
+                  <path d={neighborhoodArea} fill="url(#areaGradient)" />
+
+                  {/* City Trend Line (dashed orange/yellow) */}
+                  <path d={cityPath} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="5 4" />
+
+                  {/* District Trend Line (dashed sky blue) */}
+                  <path d={districtPath} fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 3" />
+
+                  {/* Neighborhood Line (solid sapphire blue) */}
+                  <path d={neighborhoodPath} fill="none" stroke="#1d4ed8" strokeWidth="3" />
+
+                  {/* Data Points on Neighborhood Line */}
+                  {trend.map((t, idx) => {
+                    const cx = getX(idx)
+                    const cy = getY(t.price)
+                    const isHovered = hoveredMonthIdx === idx
+                    return (
+                      <g key={idx} onMouseEnter={() => setHoveredMonthIdx(idx)} onMouseLeave={() => setHoveredMonthIdx(null)}>
+                        <circle cx={cx} cy={cy} r={isHovered ? 7 : 4} fill="#1d4ed8" stroke="white" strokeWidth={isHovered ? 3 : 2} style={{ cursor: 'pointer', transition: 'all 0.15s ease' }} />
+                        <text x={cx} y={padT + chartH + 20} textAnchor="middle" fontSize="11" fill={isHovered ? '#0f172a' : '#64748b'} fontWeight={isHovered ? '700' : '500'} fontFamily="DM Sans">
+                          {t.month}
+                        </text>
+                      </g>
+                    )
+                  })}
+
+                  {/* Hover Tooltip Box */}
+                  {hoveredMonthIdx !== null && (
+                    <g transform={`translate(${Math.min(svgW - 200, Math.max(padL, getX(hoveredMonthIdx) - 80))}, ${Math.max(10, getY(trend[hoveredMonthIdx].price) - 55)})`}>
+                      <rect width="160" height="46" rx="6" fill="#0f172a" opacity="0.92" />
+                      <text x="80" y="18" textAnchor="middle" fill="#f8fafc" fontSize="11" fontWeight="700" fontFamily="DM Sans">
+                        {trend[hoveredMonthIdx].month}: ₺{trend[hoveredMonthIdx].price.toLocaleString('tr-TR')} / m²
+                      </text>
+                      <text x="80" y="34" textAnchor="middle" fill="#94a3b8" fontSize="10" fontFamily="DM Sans">
+                        Keçiören: ₺{trend[hoveredMonthIdx].districtPrice.toLocaleString('tr-TR')}
+                      </text>
+                    </g>
+                  )}
+                </svg>
+              </div>
+
+              {/* Extra Investment Metrics */}
+              <div className="endeks-metrics-row">
+                <div className="endeks-mini-card">
+                  <small>Amortisman (Geri Dönüş) Süresi</small>
+                  <strong>{listing.amortizationYears} Yıl</strong>
+                </div>
+                <div className="endeks-mini-card">
+                  <small>Yıllık Ortalama Kira Getirisi</small>
+                  <strong>% 6.8</strong>
+                </div>
+                <div className="endeks-mini-card">
+                  <small>Bölge Yatırım Skoru</small>
+                  <strong style={{ color: '#059669' }}>8.9 / 10 (Yüksek Prim)</strong>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Lightbox Fullscreen Modal */}
+      {isLightboxOpen && (
         <div
           style={{
-            position: 'relative',
-            height: '480px',
-            borderRadius: '16px',
-            overflow: 'hidden',
-            backgroundColor: '#23182c',
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999,
+            background: 'rgba(10, 10, 15, 0.95)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px',
           }}
+          onClick={() => setIsLightboxOpen(false)}
         >
+          <button
+            onClick={() => setIsLightboxOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '24px',
+              right: '24px',
+              background: 'none',
+              border: 0,
+              color: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            <Icon name="close" size={32} />
+          </button>
+
           <img
             src={images[activeImageIndex]}
             alt={listing.title}
             style={{
-              width: '100%',
-              height: '100%',
+              maxWidth: '90vw',
+              maxHeight: '80vh',
               objectFit: 'contain',
-              backgroundColor: '#1b1422',
+              borderRadius: '8px',
             }}
+            onClick={(e) => e.stopPropagation()}
           />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '16px',
-              right: '16px',
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              color: 'white',
-              fontSize: '13px',
-              padding: '6px 14px',
-              borderRadius: '20px',
-              backdropFilter: 'blur(4px)',
-            }}
-          >
+
+          <div style={{ color: 'white', marginTop: '16px', fontSize: '14px', fontWeight: 600 }}>
             Fotoğraf {activeImageIndex + 1} / {images.length}
           </div>
-        </div>
 
-        {images.length > 1 && (
-          <div
-            style={{
-              display: 'flex',
-              gap: '12px',
-              marginTop: '12px',
-              overflowX: 'auto',
-              paddingBottom: '8px',
-            }}
-          >
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveImageIndex(idx)}
-                style={{
-                  width: '90px',
-                  height: '64px',
-                  flexShrink: 0,
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border:
-                    activeImageIndex === idx
-                      ? '3px solid var(--purple)'
-                      : '2px solid transparent',
-                  padding: 0,
-                  cursor: 'pointer',
-                  opacity: activeImageIndex === idx ? 1 : 0.7,
-                }}
-              >
-                <img
-                  src={img}
-                  alt={`Fotoğraf ${idx + 1}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="detail-layout">
-        <div className="detail-content">
-          <section className="detail-summary">
-            <div>
-              <small>İlan fiyatı</small>
-              <strong>{listing.price}</strong>
-            </div>
-            <div>
-              <Icon name="bed" />
-              <span>
-                <small>Oda sayısı</small>
-                <strong>{listing.room}</strong>
-              </span>
-            </div>
-            <div>
-              <Icon name="area" />
-              <span>
-                <small>Brüt alan</small>
-                <strong>{listing.area} m²</strong>
-              </span>
-            </div>
-            <div>
-              <Icon name="home" />
-              <span>
-                <small>Kat bilgisi</small>
-                <strong>{listing.floor}</strong>
-              </span>
-            </div>
-          </section>
-
-          <section className="detail-section">
-            <span className="section-kicker">İLAN HAKKINDA</span>
-            <h2>Konforun her tonunu keşfedin</h2>
+          {images.length > 1 && (
             <div
-              style={{
-                fontSize: '15px',
-                lineHeight: '1.8',
-                color: '#46414d',
-                whiteSpace: 'pre-line',
-              }}
+              style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto', maxWidth: '80vw' }}
+              onClick={(e) => e.stopPropagation()}
             >
-              {listing.description}
-            </div>
-          </section>
-
-          <section className="detail-section">
-            <span className="section-kicker">ÖZELLİKLER</span>
-            <h2>İlan detayları</h2>
-            <div className="spec-grid">
-              {[
-                ['Taşınmaz No (EİD)', listing.eid || `${listing.id}`],
-                ['EİDS Doğrulama', 'Bakanlık Onaylı / Doğrulandı ✓'],
-                ['Yetki Belgesi', 'Taşınmaz Ticareti Yetki Belgeli Ofis'],
-                ['İlan no', `RNK-${listing.id}`],
-                ['İlan tarihi', listing.date || '12 Haziran 2025'],
-                ['Emlak tipi', listing.type],
-                ['Net alan', `${Math.max(20, listing.area - 15)} m²`],
-                ['Bina yaşı', listing.buildingAge || '15-20'],
-                ['Banyo', listing.bathrooms || '1'],
-                ['Isıtma', listing.heating || 'Kombi (Doğalgaz)'],
-                ['Kullanım', 'Boş'],
-                ['Tapu', 'Kat mülkiyeti'],
-                ['Krediye uygun', 'Evet'],
-              ].map(([key, value]) => (
-                <div key={key}>
-                  <span>{key}</span>
-                  <strong>{value}</strong>
-                </div>
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  style={{
+                    width: '70px',
+                    height: '50px',
+                    padding: 0,
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    border: activeImageIndex === idx ? '2px solid #f59e0b' : '2px solid transparent',
+                    opacity: activeImageIndex === idx ? 1 : 0.6,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </button>
               ))}
             </div>
-          </section>
-
-          <section className="detail-section">
-            <span className="section-kicker">ÖNE ÇIKANLAR</span>
-            <h2>Yaşam alanı özellikleri</h2>
-            <div className="amenities">
-              {(
-                listing.amenities || [
-                  'Akıllı ev sistemi',
-                  'Kapalı otopark',
-                  '7/24 güvenlik',
-                  'Geniş teras',
-                  'Giyinme odası',
-                  'Ankastre mutfak',
-                  'Ebeveyn banyosu',
-                ]
-              ).map((item) => (
-                <span key={item}>
-                  <i>
-                    <Icon name="check" size={15} />
-                  </i>
-                  {item}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          {/* Harita ve Konum Bilgisi */}
-          <section className="detail-section detail-map-section">
-            <span className="section-kicker">LOKASYON & HARİTA</span>
-            <div className="map-header-row">
-              <div>
-                <h2 style={{ margin: '8px 0 4px' }}>Harita ve Konum Bilgisi</h2>
-                <p className="map-location-sub">
-                  <Icon name="pin" size={16} /> {listing.location}
-                </p>
-              </div>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${listing.lat || 39.9721},${listing.lng || 32.8284}`}
-                target="_blank"
-                rel="noreferrer"
-                className="map-nav-btn"
-              >
-                Google Haritalar'da Aç ↗
-              </a>
-            </div>
-
-            <div className="map-container">
-              <iframe
-                title={`Harita - ${listing.title}`}
-                className="map-iframe"
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${(listing.lng || 32.8284) - 0.008}%2C${(listing.lat || 39.9721) - 0.005}%2C${(listing.lng || 32.8284) + 0.008}%2C${(listing.lat || 39.9721) + 0.005}&layer=mapnik&marker=${listing.lat || 39.9721}%2C${listing.lng || 32.8284}`}
-                loading="lazy"
-              />
-              <div className="map-floating-badge">
-                <span className="map-badge-dot" />
-                <span>
-                  <strong>Renk Emlak Portföyü</strong> · EİD: {listing.eid || listing.id}
-                </span>
-              </div>
-            </div>
-
-            <div className="neighborhood-grid">
-              <div className="neighborhood-item">
-                <span className="nb-icon">🚇</span>
-                <div>
-                  <strong>Toplu Taşıma</strong>
-                  <small>EGO Otobüs durağı 100m, Metro İstasyonu 1.2 km</small>
-                </div>
-              </div>
-              <div className="neighborhood-item">
-                <span className="nb-icon">🏥</span>
-                <div>
-                  <strong>Sağlık Merkezleri</strong>
-                  <small>Etlik Şehir Hastanesi & Sağlık Ocağı 5-7 dk</small>
-                </div>
-              </div>
-              <div className="neighborhood-item">
-                <span className="nb-icon">🏫</span>
-                <div>
-                  <strong>Eğitim Kurumları</strong>
-                  <small>İlk & Ortaokul, Liseler yürüme mesafesinde</small>
-                </div>
-              </div>
-              <div className="neighborhood-item">
-                <span className="nb-icon">🛒</span>
-                <div>
-                  <strong>Alışveriş & Sosyal</strong>
-                  <small>Semt Pazarı, Süpermarketler ve Parklar çok yakın</small>
-                </div>
-              </div>
-            </div>
-          </section>
+          )}
         </div>
-
-        <aside className="agent-card">
-          <span className="agent-label">PORTFÖY DANIŞMANI</span>
-          <div className="agent-profile">
-            <div className="agent-avatar" style={{ backgroundColor: 'var(--purple)' }}>
-              MK
-            </div>
-            <div>
-              <strong>Mesut KAYA</strong>
-              <span>Gayrimenkul Danışmanı</span>
-            </div>
-          </div>
-          <p>
-            Bu ilanla ilgili tüm sorularınız ve özel gösterim talebiniz için bana ulaşabilirsiniz.
-          </p>
-          <a
-            href="tel:03123521515"
-            className="call-button"
-            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            <Icon name="phone" /> (0312) 352 15 15
-          </a>
-          <a
-            href={`https://wa.me/905423521515?text=${whatsappMessage}`}
-            target="_blank"
-            rel="noreferrer"
-            className="message-button"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              backgroundColor: '#25D366',
-              color: 'white',
-              border: 'none',
-              marginTop: '10px',
-            }}
-          >
-            <Icon name="whatsapp" size={18} /> WhatsApp ile Mesaj Yaz
-          </a>
-          <small>İlan sahibiyle iletişime geçtiğinizde ilan numarasını belirtiniz.</small>
-        </aside>
-      </div>
+      )}
     </main>
   )
 }
@@ -1486,6 +2007,7 @@ export default function App() {
           onBack={goHome}
           isSaved={savedIds.has(selected.id)}
           onToggleSave={toggleSave}
+          onOpenConsultation={() => setConsultationOpen(true)}
         />
       ) : (
         <HomePage
