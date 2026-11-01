@@ -41,6 +41,8 @@ const Icon = ({
     | 'coffee'
     | 'info'
     | 'trendUp'
+    | 'userPlus'
+    | 'lock'
   size?: number
 }) => {
   const paths: Record<typeof name, ReactNode> = {
@@ -237,6 +239,20 @@ const Icon = ({
         <polyline points="16 7 22 7 22 13" />
       </>
     ),
+    userPlus: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <line x1="19" y1="8" x2="19" y2="14" />
+        <line x1="22" y1="11" x2="16" y2="11" />
+      </>
+    ),
+    lock: (
+      <>
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </>
+    ),
   }
   return (
     <svg
@@ -255,18 +271,50 @@ const Icon = ({
   )
 }
 
+export interface AuthUser {
+  id: string
+  name: string
+  email: string
+  phone: string
+  tckn: string
+  accountType: 'Bireysel' | 'Kurumsal'
+  companyName?: string
+  authCertNo?: string
+  registeredAt: string
+}
+
+const getRegisteredUsers = (): AuthUser[] => {
+  try {
+    const raw = localStorage.getItem('renk_emlak_registered_users')
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+const saveRegisteredUser = (user: AuthUser) => {
+  const users = getRegisteredUsers().filter((u) => u.email.toLowerCase() !== user.email.toLowerCase())
+  users.push(user)
+  localStorage.setItem('renk_emlak_registered_users', JSON.stringify(users))
+}
+
 function Header({
   onHome,
   onNavigate,
   onOpenConsultation,
-  onOpenLogin,
+  onOpenAuth,
+  currentUser,
+  onLogout,
 }: {
   onHome: () => void
   onNavigate: (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => void
   onOpenConsultation: () => void
-  onOpenLogin: () => void
+  onOpenAuth: (mode: 'login' | 'register') => void
+  currentUser: AuthUser | null
+  onLogout: () => void
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
 
   return (
     <header className="site-header">
@@ -292,13 +340,92 @@ function Header({
         >
           <Icon name="heart" />
         </button>
-        <button className="login-button" onClick={onOpenLogin}>
-          <Icon name="user" />
-          <span>Giriş Yap</span>
-        </button>
+
+        {currentUser ? (
+          <div className="user-menu-wrapper">
+            <button
+              className="user-profile-button"
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              aria-label="Kullanıcı Profili"
+            >
+              <div className="user-avatar-circle">
+                {currentUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="user-info-text">
+                <span className="user-display-name">{currentUser.name.split(' ')[0]}</span>
+                <span className="user-type-tag">{currentUser.accountType}</span>
+              </div>
+              <Icon name="chevron" size={12} />
+            </button>
+
+            {userDropdownOpen && (
+              <div className="user-dropdown-card">
+                <div className="dropdown-user-header">
+                  <strong>{currentUser.name}</strong>
+                  <small>{currentUser.email}</small>
+                  <div className="dropdown-tckn-badge">
+                    <Icon name="check" size={11} /> EİDS T.C.K.N Doğrulandı
+                  </div>
+                </div>
+                <div className="dropdown-details-list">
+                  <div>
+                    <span>T.C.K.N:</span>
+                    <strong>{currentUser.tckn.slice(0, 3)}*****{currentUser.tckn.slice(8)}</strong>
+                  </div>
+                  <div>
+                    <span>Gsm No:</span>
+                    <strong>{currentUser.phone}</strong>
+                  </div>
+                  <div>
+                    <span>Üyelik Türü:</span>
+                    <strong>{currentUser.accountType}</strong>
+                  </div>
+                  {currentUser.companyName && (
+                    <div>
+                      <span>Firma:</span>
+                      <strong>{currentUser.companyName}</strong>
+                    </div>
+                  )}
+                  {currentUser.authCertNo && (
+                    <div>
+                      <span>Yetki Belge:</span>
+                      <strong>{currentUser.authCertNo}</strong>
+                    </div>
+                  )}
+                </div>
+                <div className="dropdown-divider" />
+                <button
+                  className="dropdown-action-btn"
+                  onClick={() => {
+                    setUserDropdownOpen(false)
+                    onOpenConsultation()
+                  }}
+                >
+                  <Icon name="home" size={15} /> Portföy & İlan Danışmanlığı
+                </button>
+                <button
+                  className="dropdown-logout-btn"
+                  onClick={() => {
+                    setUserDropdownOpen(false)
+                    onLogout()
+                  }}
+                >
+                  <Icon name="close" size={14} /> Oturumu Kapat
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button className="login-button" onClick={() => onOpenAuth('login')}>
+            <Icon name="user" />
+            <span>Giriş Yap</span>
+          </button>
+        )}
+
         <button className="primary-button" onClick={onOpenConsultation}>
           Ücretsiz İlan Ver
         </button>
+
         <button
           className="mobile-menu-toggle"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -343,15 +470,39 @@ function Header({
             Kurumsal & İletişim
           </button>
           <div className="mobile-menu-divider" />
-          <button
-            className="mobile-menu-login"
-            onClick={() => {
-              setMobileMenuOpen(false)
-              onOpenLogin()
-            }}
-          >
-            <Icon name="user" size={17} /> Giriş Yap
-          </button>
+          {currentUser ? (
+            <div className="mobile-logged-user-box" style={{ padding: '8px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <div className="user-avatar-circle">{currentUser.name.charAt(0).toUpperCase()}</div>
+                <div>
+                  <strong>{currentUser.name}</strong>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>
+                    {currentUser.accountType} · {currentUser.phone}
+                  </div>
+                </div>
+              </div>
+              <button
+                className="dropdown-logout-btn"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  onLogout()
+                }}
+              >
+                <Icon name="close" size={14} /> Çıkış Yap
+              </button>
+            </div>
+          ) : (
+            <button
+              className="mobile-menu-login"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                onOpenAuth('login')
+              }}
+            >
+              <Icon name="user" size={17} /> Giriş Yap / Hesap Oluştur
+            </button>
+          )}
         </div>
       )}
     </header>
@@ -1650,124 +1801,576 @@ function DetailPage({
   )
 }
 
-function LoginModal({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isRegister, setIsRegister] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    alert(isRegister ? 'Kayıt başarılı! Giriş yapabilirsiniz.' : 'Giriş başarılı!')
-    onClose()
-  }
+function ToastNotification({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 5000)
+    return () => clearTimeout(timer)
+  }, [onClose])
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 100,
-        backgroundColor: 'rgba(23, 21, 29, 0.75)',
-        backdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          maxWidth: '420px',
-          width: '100%',
-          padding: '32px',
-          boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-          position: 'relative',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            border: 0,
-            background: 'none',
-            color: 'var(--muted)',
-            cursor: 'pointer',
-          }}
-          aria-label="Kapat"
-        >
-          <Icon name="close" size={22} />
-        </button>
+    <div className="toast-notification-banner">
+      <div className="toast-icon-wrap">
+        <Icon name="check" size={16} />
+      </div>
+      <span className="toast-text">{message}</span>
+      <button className="toast-close-btn" onClick={onClose} aria-label="Kapat">
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+  )
+}
 
-        <span className="section-kicker">RENK EMLAK</span>
-        <h2 style={{ fontSize: '22px', margin: '6px 0 16px' }}>
-          {isRegister ? 'Yeni Hesap Oluştur' : 'Giriş Yap'}
-        </h2>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
-            E-posta Adresi
-            <input
-              type="email"
-              required
-              placeholder="ornek@renkemlak.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                border: '1px solid var(--line)',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-              }}
-            />
-          </label>
-
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
-            Şifre
-            <input
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                border: '1px solid var(--line)',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-              }}
-            />
-          </label>
-
-          <button type="submit" className="primary-button" style={{ width: '100%', marginTop: '6px' }}>
-            {isRegister ? 'Kayıt Ol' : 'Giriş Yap'}
+function TermsModal({
+  onClose,
+  onAccept,
+}: {
+  onClose: () => void
+  onAccept: () => void
+}) {
+  return (
+    <div className="terms-modal-overlay" onClick={onClose}>
+      <div className="terms-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div className="terms-modal-header">
+          <h3>Renk Emlak Üyelik ve Hizmet Sözleşmesi</h3>
+          <button onClick={onClose} aria-label="Kapat">
+            <Icon name="close" size={18} />
           </button>
+        </div>
+        <div className="terms-modal-body">
+          <h4>1. Taraflar ve Sözleşmenin Konusu</h4>
+          <p>
+            İşbu sözleşme, Renk Emlak Gayrimenkul Danışmanlığı (Ankara Keçiören) ile renkemlak.com portalına üye olan gerçek veya tüzel kişi ("Üye") arasında akdedilmiştir. Portal üzerinden gayrimenkul portföyü inceleme, ilan yayınlama, ekspertiz ve teklif hizmetlerinin şartlarını düzenler.
+          </p>
 
-          <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '13px', color: 'var(--muted)' }}>
-            {isRegister ? 'Zaten hesabınız var mı? ' : 'Hesabınız yok mu? '}
-            <button
-              type="button"
-              onClick={() => setIsRegister(!isRegister)}
-              style={{ border: 0, background: 'none', color: 'var(--purple)', fontWeight: 700, cursor: 'pointer' }}
-            >
-              {isRegister ? 'Giriş Yap' : 'Kayıt Ol'}
-            </button>
-          </div>
-        </form>
+          <h4>2. Ticaret Bakanlığı EİDS ve T.C.K.N Doğrulama Zorunluluğu</h4>
+          <p>
+            Ticaret Bakanlığı Taşınmaz Ticareti Hakkında Yönetmelik ve Elektronik İlan Doğrulama Sistemi (EİDS) genelgeleri doğrultusunda, gayrimenkul ilanı verme, portföy oluşturma veya ekspertiz talebinde bulunma işlemlerinde 11 haneli T.C. Kimlik Numarası (T.C.K.N) girilmesi ve doğrulanması kanunen zorunludur. Üye, sağladığı kimlik bilgilerinin güncel ve şahsına ait olduğunu beyan ve taahhüt eder.
+          </p>
+
+          <h4>3. Kişisel Verilerin Korunması (KVKK) Aydınlatması</h4>
+          <p>
+            6698 sayılı KVKK kapsamında üyelik formu aracılığıyla toplanan Ad-Soyad, Telefon, E-posta ve T.C.K.N verileri; yasal mevzuata uyum, tapu ve ada/parsel sorguları, danışman iletişimi ve güvenlik amacıyla işlenmektedir. Bilgileriniz hiçbir koşulda ticari amaçla üçüncü kişilere devredilmez.
+          </p>
+
+          <h4>4. Üyenin Hak ve Sorumlulukları</h4>
+          <p>
+            Üye, portföy ilanlarında doğru bilgi vermekle, üçüncü kişilerin mülkiyet haklarını ihlal etmemekle ve hesap bilgilerini gizli tutmakla yükümlüdür. Renk Emlak, mevzuata aykırı veya sahte ilanları kaldırma hakkını saklı tutar.
+          </p>
+        </div>
+        <div className="terms-modal-footer">
+          <button className="terms-accept-btn" onClick={onAccept}>
+            Okudum, Anladım ve Kabul Ediyorum
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-function ConsultationModal({ onClose }: { onClose: () => void }) {
-  const [submitted, setSubmitted] = useState(false)
+function AuthModal({
+  initialMode = 'register',
+  onClose,
+  onLoginSuccess,
+}: {
+  initialMode?: 'login' | 'register'
+  onClose: () => void
+  onLoginSuccess: (user: AuthUser, message: string) => void
+}) {
+  const [mode, setMode] = useState<'register' | 'login'>(initialMode)
+  const [accountType, setAccountType] = useState<'Bireysel' | 'Kurumsal'>('Bireysel')
+
+  // Register Form State
   const [name, setName] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [authCertNo, setAuthCertNo] = useState('')
+  const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [tckn, setTckn] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [showTermsModal, setShowTermsModal] = useState(false)
+
+  // Login Form State
+  const [loginIdentifier, setLoginIdentifier] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
+
+  const handleRegisterSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError(null)
+
+    if (tckn.length !== 11 || !/^\d{11}$/.test(tckn)) {
+      setFormError('T.C. Kimlik Numarası tam 11 haneli rakamlardan oluşmalıdır.')
+      return
+    }
+
+    if (password.length < 6) {
+      setFormError('Parolanız en az 6 karakter uzunluğunda olmalıdır.')
+      return
+    }
+
+    if (password !== passwordConfirm) {
+      setFormError('Girdiğiniz parolalar birbiriyle eşleşmiyor.')
+      return
+    }
+
+    if (!termsAccepted) {
+      setFormError('Lütfen Hizmet Sözleşmesi\'ni okuyup kabul ediniz.')
+      return
+    }
+
+    const newUser: AuthUser = {
+      id: `RNK-${Date.now().toString().slice(-6)}`,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      tckn: tckn.trim(),
+      accountType,
+      companyName: accountType === 'Kurumsal' ? companyName.trim() : undefined,
+      authCertNo: accountType === 'Kurumsal' ? authCertNo.trim() : undefined,
+      registeredAt: new Date().toLocaleDateString('tr-TR'),
+    }
+
+    saveRegisteredUser(newUser)
+    localStorage.setItem('renk_emlak_active_user', JSON.stringify(newUser))
+    onLoginSuccess(newUser, `Tebrikler Sayın ${newUser.name}! Hesabınız başarıyla oluşturuldu ve sisteme giriş yapıldı.`)
+    onClose()
+  }
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError(null)
+
+    const identifier = loginIdentifier.trim().toLowerCase()
+    const users = getRegisteredUsers()
+    const matched = users.find(
+      (u) =>
+        u.email.toLowerCase() === identifier ||
+        u.tckn === identifier ||
+        u.phone.replace(/\D/g, '') === identifier.replace(/\D/g, '')
+    )
+
+    if (matched) {
+      localStorage.setItem('renk_emlak_active_user', JSON.stringify(matched))
+      onLoginSuccess(matched, `Giriş başarılı! Hoş geldiniz, Sayın ${matched.name}.`)
+      onClose()
+      return
+    }
+
+    // Mesut Kaya Danışman Demo
+    if (identifier.includes('mesut') || identifier === '0600124') {
+      const demo: AuthUser = {
+        id: 'RNK-U001',
+        name: 'Mesut KAYA',
+        email: 'mesut@renkemlak.com',
+        phone: '0 (312) 352 15 15',
+        tckn: '19482015822',
+        accountType: 'Kurumsal',
+        companyName: 'Renk Emlak Gayrimenkul Danışmanlığı',
+        authCertNo: '0600124',
+        registeredAt: '01.01.2024',
+      }
+      localStorage.setItem('renk_emlak_active_user', JSON.stringify(demo))
+      onLoginSuccess(demo, 'Mesut KAYA (Yetkili Gayrimenkul Danışmanı) olarak giriş yapıldı.')
+      onClose()
+      return
+    }
+
+    // Auto-create on valid email credentials
+    if (identifier.includes('@') && loginPassword.length >= 6) {
+      const autoUser: AuthUser = {
+        id: `RNK-${Date.now().toString().slice(-6)}`,
+        name: identifier.split('@')[0].toUpperCase(),
+        email: identifier,
+        phone: '0 (542) 352 15 15',
+        tckn: '28471930281',
+        accountType: 'Bireysel',
+        registeredAt: new Date().toLocaleDateString('tr-TR'),
+      }
+      saveRegisteredUser(autoUser)
+      localStorage.setItem('renk_emlak_active_user', JSON.stringify(autoUser))
+      onLoginSuccess(autoUser, `Giriş başarılı! Hoş geldiniz, ${autoUser.name}.`)
+      onClose()
+      return
+    }
+
+    setFormError('Kullanıcı bilgisi bulunamadı. Lütfen bilgilerinizi kontrol edin veya "Hesap Oluştur" sekmesinden yeni üyelik oluşturun.')
+  }
+
+  return (
+    <div className="auth-overlay" onClick={onClose}>
+      <div className="auth-modal-window" onClick={(e) => e.stopPropagation()}>
+        {/* Top Header Row with Logo & Title */}
+        <div className="auth-modal-header">
+          <div className="auth-logo-badge">
+            <img src="/renk-emlak-logo.png" alt="Renk Emlak" />
+          </div>
+          <div className="auth-header-title-box">
+            <h2>{mode === 'register' ? 'Hesap Oluştur' : 'Üye Girişi'}</h2>
+          </div>
+          <button className="auth-close-btn" onClick={onClose} aria-label="Kapat">
+            <Icon name="close" size={20} />
+          </button>
+        </div>
+
+        {/* Modal Body: Left White Card & Right Pitch */}
+        <div className="auth-modal-body">
+          {/* Left Column: Floating Form Card */}
+          <div className="auth-form-card">
+            <div className="auth-card-top-title">
+              <Icon name={mode === 'register' ? 'userPlus' : 'user'} size={19} />
+              <span>{mode === 'register' ? 'Hesap Oluştur' : 'Üye Girişi'}</span>
+            </div>
+
+            {formError && (
+              <div className="auth-error-alert">
+                <Icon name="info" size={15} />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            {mode === 'register' ? (
+              <form onSubmit={handleRegisterSubmit} className="auth-form-grid">
+                {/* Üyelik Türü */}
+                <div className="auth-row">
+                  <span className="auth-row-label">Üyelik Türü;</span>
+                  <div className="auth-radio-options">
+                    <label className="auth-radio-label">
+                      <input
+                        type="radio"
+                        name="accountType"
+                        checked={accountType === 'Bireysel'}
+                        onChange={() => setAccountType('Bireysel')}
+                      />
+                      <span>Bireysel</span>
+                    </label>
+                    <label className="auth-radio-label">
+                      <input
+                        type="radio"
+                        name="accountType"
+                        checked={accountType === 'Kurumsal'}
+                        onChange={() => setAccountType('Kurumsal')}
+                      />
+                      <span>Kurumsal</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Adınız Soyadınız */}
+                <div className="auth-row">
+                  <label className="auth-row-label">
+                    {accountType === 'Kurumsal' ? 'Yetkili Ad Soyad' : 'Adınız Soyadınız'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="auth-input-box"
+                    placeholder="Örn: Ahmet Yılmaz"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                {/* Kurumsal Bilgiler */}
+                {accountType === 'Kurumsal' && (
+                  <>
+                    <div className="auth-row">
+                      <label className="auth-row-label">Şirket Unvanı</label>
+                      <input
+                        type="text"
+                        required
+                        className="auth-input-box"
+                        placeholder="Örn: Renk Emlak Gayrimenkul Ltd."
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                      />
+                    </div>
+                    <div className="auth-row">
+                      <label className="auth-row-label">Yetki Belge No</label>
+                      <input
+                        type="text"
+                        required
+                        className="auth-input-box"
+                        placeholder="Örn: 0600124 (Taşınmaz Ticareti)"
+                        value={authCertNo}
+                        onChange={(e) => setAuthCertNo(e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* E-Posta Adresiniz */}
+                <div className="auth-row">
+                  <label className="auth-row-label">E-Posta Adresiniz</label>
+                  <input
+                    type="email"
+                    required
+                    className="auth-input-box"
+                    placeholder="ornek@mail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+
+                {/* Gsm No */}
+                <div className="auth-row">
+                  <label className="auth-row-label">Gsm No</label>
+                  <input
+                    type="tel"
+                    required
+                    className="auth-input-box"
+                    placeholder="0 (5XX) XXX XX XX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+
+                {/* T.C.K.N */}
+                <div className="auth-row">
+                  <label className="auth-row-label">T.C.K.N</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <input
+                      type="text"
+                      required
+                      maxLength={11}
+                      className="auth-input-box"
+                      placeholder="11 Haneli T.C. Kimlik Numaranız"
+                      value={tckn}
+                      onChange={(e) => setTckn(e.target.value.replace(/\D/g, ''))}
+                    />
+                    <span className="auth-sub-hint">
+                      Ticaret Bakanlığı EİDS mevzuatı uyarınca zorunludur.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Parola Belirleyin */}
+                <div className="auth-row">
+                  <label className="auth-row-label">Parola Belirleyin</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    className="auth-input-box"
+                    placeholder="En az 6 karakter"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+
+                {/* Parolayı Tekrar Yazın */}
+                <div className="auth-row">
+                  <label className="auth-row-label">Parolayı Tekrar Yazın</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    className="auth-input-box"
+                    placeholder="Parolanızı tekrar yazın"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                  />
+                </div>
+
+                {/* Hizmet Sözleşmesi Checkbox */}
+                <div className="auth-terms-row">
+                  <label className="auth-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                    />
+                    <span>
+                      <button
+                        type="button"
+                        className="auth-terms-inline-link"
+                        onClick={() => setShowTermsModal(true)}
+                      >
+                        Hizmet Sözleşmesi
+                      </button>
+                      'ni Okudum ve Kabul Ediyorum.
+                    </span>
+                  </label>
+                </div>
+
+                {/* Submit Button */}
+                <div className="auth-btn-row">
+                  <button type="submit" className="auth-red-outline-btn">
+                    <Icon name="userPlus" size={16} />
+                    <span>Hesap Oluştur</span>
+                  </button>
+                </div>
+              </form>
+            ) : (
+              /* LOGIN FORM */
+              <form onSubmit={handleLoginSubmit} className="auth-form-grid">
+                <div className="auth-row">
+                  <label className="auth-row-label">E-Posta / T.C.K.N</label>
+                  <input
+                    type="text"
+                    required
+                    className="auth-input-box"
+                    placeholder="E-posta, T.C.K.N veya Gsm"
+                    value={loginIdentifier}
+                    onChange={(e) => setLoginIdentifier(e.target.value)}
+                  />
+                </div>
+
+                <div className="auth-row">
+                  <label className="auth-row-label">Parolanız</label>
+                  <input
+                    type="password"
+                    required
+                    className="auth-input-box"
+                    placeholder="••••••••"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                  />
+                </div>
+
+                <div className="auth-login-options-row">
+                  <label className="auth-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                    <span>Beni Hatırla</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="auth-forgot-link"
+                    onClick={() => alert('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.')}
+                  >
+                    Şifremi Unuttum?
+                  </button>
+                </div>
+
+                <div className="auth-btn-row">
+                  <button type="submit" className="auth-red-outline-btn" style={{ minWidth: '170px' }}>
+                    <Icon name="user" size={16} />
+                    <span>Giriş Yap</span>
+                  </button>
+                </div>
+
+                {/* Quick Demo Login */}
+                <div className="auth-demo-box">
+                  <span className="auth-demo-label">Hızlı Test Girişi (1 Tıkla Giriş):</span>
+                  <div className="auth-demo-buttons">
+                    <button
+                      type="button"
+                      className="auth-demo-pill"
+                      onClick={() => {
+                        const demo: AuthUser = {
+                          id: 'USR-DEMO1',
+                          name: 'Ahmet Yılmaz',
+                          email: 'ahmet.yilmaz@gmail.com',
+                          phone: '0 (532) 412 88 90',
+                          tckn: '38192049182',
+                          accountType: 'Bireysel',
+                          registeredAt: '01.11.2026',
+                        }
+                        localStorage.setItem('renk_emlak_active_user', JSON.stringify(demo))
+                        onLoginSuccess(demo, 'Ahmet Yılmaz (Bireysel Müşteri) olarak giriş yapıldı.')
+                        onClose()
+                      }}
+                    >
+                      👤 Ahmet Yılmaz (Bireysel Müşteri)
+                    </button>
+                    <button
+                      type="button"
+                      className="auth-demo-pill"
+                      onClick={() => {
+                        const demo: AuthUser = {
+                          id: 'USR-DANISMAN',
+                          name: 'Mesut KAYA',
+                          email: 'mesut@renkemlak.com',
+                          phone: '0 (312) 352 15 15',
+                          tckn: '19482015822',
+                          accountType: 'Kurumsal',
+                          companyName: 'Renk Emlak Gayrimenkul Danışmanlığı',
+                          authCertNo: '0600124',
+                          registeredAt: '01.01.2024',
+                        }
+                        localStorage.setItem('renk_emlak_active_user', JSON.stringify(demo))
+                        onLoginSuccess(demo, 'Mesut KAYA (Yetkili Gayrimenkul Danışmanı) olarak giriş yapıldı.')
+                        onClose()
+                      }}
+                    >
+                      🏢 Mesut KAYA (Yetkili Gayrimenkul Danışmanı)
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+          </div>
+
+          {/* Right Column: Info & Toggle */}
+          <div className="auth-side-col">
+            {mode === 'register' ? (
+              <>
+                <p className="auth-side-pitch">
+                  İlan yayınlamak ve tüm hizmetlerimizden faydalanmak için hemen hesap oluşturun.
+                </p>
+                <span className="auth-side-question">Zaten bir hesabınız var ise;</span>
+                <button
+                  type="button"
+                  className="auth-side-action-btn"
+                  onClick={() => {
+                    setFormError(null)
+                    setMode('login')
+                  }}
+                >
+                  Üye Girişi Yap
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="auth-side-pitch">
+                  İlanlarınızı yönetmek, favori portföyleri takip etmek ve EİDS onaylı güvenli teklifler vermek için giriş yapın.
+                </p>
+                <span className="auth-side-question">Henüz bir hesabınız yok mu?</span>
+                <button
+                  type="button"
+                  className="auth-side-action-btn"
+                  onClick={() => {
+                    setFormError(null)
+                    setMode('register')
+                  }}
+                >
+                  Hesap Oluştur
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {showTermsModal && (
+        <TermsModal
+          onClose={() => setShowTermsModal(false)}
+          onAccept={() => {
+            setTermsAccepted(true)
+            setShowTermsModal(false)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+function ConsultationModal({
+  onClose,
+  currentUser,
+}: {
+  onClose: () => void
+  currentUser?: AuthUser | null
+}) {
+  const [submitted, setSubmitted] = useState(false)
+  const [name, setName] = useState(currentUser?.name || '')
+  const [phone, setPhone] = useState(currentUser?.phone || '')
   const [type, setType] = useState('Satılık Daire')
   const [eid, setEid] = useState('')
   const [note, setNote] = useState('')
@@ -2041,7 +2644,19 @@ export default function App() {
   const [filterStatus, setFilterStatus] = useState<'Satılık' | 'Kiralık' | 'Proje'>('Satılık')
   const [savedIds, setSavedIds] = useState<Set<number>>(() => new Set())
   const [consultationOpen, setConsultationOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'register' }>({
+    isOpen: false,
+    mode: 'register',
+  })
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
+    try {
+      const saved = localStorage.getItem('renk_emlak_active_user')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   const toggleSave = (id: number) => {
     setSavedIds((prev) => {
@@ -2081,13 +2696,26 @@ export default function App() {
     }
   }
 
+  const handleLoginSuccess = (user: AuthUser, message: string) => {
+    setCurrentUser(user)
+    setToastMessage(message)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('renk_emlak_active_user')
+    setCurrentUser(null)
+    setToastMessage('Oturumunuz başarıyla kapatıldı.')
+  }
+
   return (
     <div className="app">
       <Header
         onHome={goHome}
         onNavigate={handleNavigate}
         onOpenConsultation={() => setConsultationOpen(true)}
-        onOpenLogin={() => setLoginOpen(true)}
+        onOpenAuth={(mode) => setAuthModal({ isOpen: true, mode })}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
       {selected ? (
         <DetailPage
@@ -2107,8 +2735,25 @@ export default function App() {
         />
       )}
       <Footer />
-      {consultationOpen && <ConsultationModal onClose={() => setConsultationOpen(false)} />}
-      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
+      {consultationOpen && (
+        <ConsultationModal
+          onClose={() => setConsultationOpen(false)}
+          currentUser={currentUser}
+        />
+      )}
+      {authModal.isOpen && (
+        <AuthModal
+          initialMode={authModal.mode}
+          onClose={() => setAuthModal({ isOpen: false, mode: 'register' })}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+      {toastMessage && (
+        <ToastNotification
+          message={toastMessage}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }
