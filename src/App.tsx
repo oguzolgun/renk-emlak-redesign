@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { listings, type Listing } from './listingsData'
 
 const Icon = ({
@@ -14,6 +14,10 @@ const Icon = ({
     | 'area'
     | 'bed'
     | 'chevron'
+    | 'chevronLeft'
+    | 'chevronRight'
+    | 'sparkles'
+    | 'flame'
     | 'sliders'
     | 'phone'
     | 'share'
@@ -85,6 +89,17 @@ const Icon = ({
       </>
     ),
     chevron: <path d="m9 18 6-6-6-6" />,
+    chevronLeft: <path d="m15 18-6-6 6-6" />,
+    chevronRight: <path d="m9 18 6-6-6-6" />,
+    sparkles: (
+      <path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z" />
+    ),
+    flame: (
+      <>
+        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.4 0 2.5-1.1 2.5-2.5 0-1.5-1-2.2-1.7-3.2-.6-.8-.8-1.5-.8-2.3 0-.5.2-1 .5-1.5C9.3 8.3 7 10.7 7 14c0 .2 0 .4.1.5Z" />
+        <path d="M14.5 10c-.8-1.7-2.3-3.1-2.5-5-.1 0-.1 0 0 0-.2.6-.5 1.2-1 1.7C9.2 8.5 7 11.4 7 15a5 5 0 0 0 10 0c0-1.8-.7-3.4-2.5-5Z" />
+      </>
+    ),
     sliders: (
       <>
         <path d="M4 6h16M4 12h16M4 18h16" />
@@ -774,6 +789,235 @@ function ListingCard({
   )
 }
 
+function FeaturedDealsSection({
+  onOpen,
+  savedIds,
+  onToggleSave,
+}: {
+  onOpen: (listing: Listing) => void
+  savedIds: Set<number>
+  onToggleSave: (id: number) => void
+}) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+  const [isDown, setIsDown] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeftPos, setScrollLeftPos] = useState(0)
+  const [moved, setMoved] = useState(false)
+
+  // Curate 10 standout opportunity listings from portfolio
+  const featuredDeals = useMemo(() => {
+    const featured = listings.filter((l) => l.featured)
+    const others = listings.filter((l) => !l.featured)
+    return [...featured, ...others.slice(0, 6)]
+  }, [])
+
+  const checkScroll = () => {
+    const el = trackRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 10)
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10)
+  }
+
+  useEffect(() => {
+    checkScroll()
+    const el = trackRef.current
+    if (!el) return
+    const onScroll = () => checkScroll()
+    el.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [featuredDeals])
+
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    const el = trackRef.current
+    if (!el) return
+    const amount = 380
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' })
+  }
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = trackRef.current
+    if (!el) return
+    setIsDown(true)
+    setMoved(false)
+    setStartX(e.pageX - el.offsetLeft)
+    setScrollLeftPos(el.scrollLeft)
+  }
+
+  const handleMouseLeave = () => {
+    setIsDown(false)
+  }
+
+  const handleMouseUp = () => {
+    setIsDown(false)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDown) return
+    const el = trackRef.current
+    if (!el) return
+    e.preventDefault()
+    const x = e.pageX - el.offsetLeft
+    const walk = (x - startX) * 1.4
+    if (Math.abs(walk) > 6) {
+      setMoved(true)
+    }
+    el.scrollLeft = scrollLeftPos - walk
+  }
+
+  const getDealBadge = (deal: Listing, idx: number) => {
+    if (deal.opportunityTag) return deal.opportunityTag
+    const tags = [
+      'Öne Çıkan Fırsat',
+      'Kupon Kiralık',
+      'Yüksek Getiri',
+      'Panoramik Manzara',
+      'Fiyatı Düştü',
+      'Kupon Yatırım',
+      'Merkezi Konum',
+      'Ticari Fırsat',
+      'Hemen Taşın',
+      'Acil Kiralık',
+    ]
+    return tags[idx % tags.length]
+  }
+
+  return (
+    <section id="featured-deals" className="featured-deals-section">
+      <div className="featured-deals-header">
+        <div className="featured-deals-title-area">
+          <span className="section-kicker">ÖZEL SEÇKİ</span>
+          <h2 className="featured-deals-title">Öne Çıkan Fırsatlar</h2>
+          <p className="featured-deals-subtitle">
+            Bölgenin en çok talep gören, özel fiyatlı ve yüksek kira getirili gayrimenkul fırsatları.
+          </p>
+        </div>
+        <div className="featured-deals-controls">
+          <div className="deals-counter-badge">
+            <Icon name="sparkles" size={14} />
+            <span>{featuredDeals.length} Özel Fırsat</span>
+          </div>
+          <div className="carousel-nav-arrows">
+            <button
+              type="button"
+              className="carousel-arrow-btn"
+              onClick={() => scrollCarousel('left')}
+              disabled={!canScrollLeft}
+              aria-label="Önceki fırsatlar"
+              title="Önceki fırsatlar"
+            >
+              <Icon name="chevronLeft" size={18} />
+            </button>
+            <button
+              type="button"
+              className="carousel-arrow-btn"
+              onClick={() => scrollCarousel('right')}
+              disabled={!canScrollRight}
+              aria-label="Sonraki fırsatlar"
+              title="Sonraki fırsatlar"
+            >
+              <Icon name="chevronRight" size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="featured-carousel-wrap">
+        <div
+          ref={trackRef}
+          className={`featured-carousel-track ${isDown ? 'is-dragging' : ''}`}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
+          {featuredDeals.map((deal, idx) => (
+            <article
+              key={deal.id}
+              className="featured-deal-card"
+              onClick={() => {
+                if (!moved) onOpen(deal)
+              }}
+            >
+              <div className="deal-card-media">
+                <img
+                  src={deal.image}
+                  alt={deal.title}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=85'
+                  }}
+                />
+                <span className="deal-card-badge">
+                  <Icon name="sparkles" size={12} />
+                  {getDealBadge(deal, idx)}
+                </span>
+                <span className="deal-eid-tag">
+                  EİD: {deal.eid || deal.id}
+                </span>
+                <button
+                  type="button"
+                  className={`deal-save-btn ${savedIds.has(deal.id) ? 'saved' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onToggleSave(deal.id)
+                  }}
+                  aria-label="Favoriye ekle"
+                >
+                  <Icon name="heart" size={17} />
+                </button>
+              </div>
+              <div className="deal-card-content">
+                <div className="deal-meta-top">
+                  <span className="deal-prop-type">
+                    {deal.type} {deal.propertyType || 'Daire'}
+                  </span>
+                  <span className="deal-eids-pill" title="Elektronik İlan Doğrulama Sistemi Onaylı">
+                    <Icon name="check" size={12} /> EİDS Doğrulandı
+                  </span>
+                </div>
+                <h3 className="deal-title" title={deal.title}>
+                  {deal.title}
+                </h3>
+                <p className="deal-location">
+                  <Icon name="pin" size={14} />
+                  {deal.location}
+                </p>
+                <div className="deal-facts-row">
+                  <span className="deal-fact-item">
+                    <Icon name="bed" size={15} />
+                    {deal.room}
+                  </span>
+                  <span className="deal-fact-item">
+                    <Icon name="area" size={15} />
+                    {deal.area} m²
+                  </span>
+                  <span className="deal-fact-item">
+                    <Icon name="home" size={15} />
+                    {deal.floor}
+                  </span>
+                </div>
+                <div className="deal-card-footer">
+                  <strong className="deal-price-val">{deal.price}</strong>
+                  <span className="deal-view-btn">
+                    İncele <Icon name="arrow" size={14} />
+                  </span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function HomePage({
   onOpen,
   filterStatus,
@@ -841,18 +1085,25 @@ function HomePage({
     return sortedListings.slice(0, visibleCount)
   }, [sortedListings, visibleCount])
 
-  const scrollToListings = () =>
-    document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToListings = () => {
+    const el = document.querySelector('#featured-deals') || document.querySelector('#listings')
+    el?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <>
       <Hero onExplore={scrollToListings} />
+      <FeaturedDealsSection
+        onOpen={onOpen}
+        savedIds={savedIds}
+        onToggleSave={onToggleSave}
+      />
       <main id="listings" className="listing-section">
         <div className="listing-intro">
           <div>
             <span className="section-kicker">SEÇKİN PORTFÖY</span>
-            <h2>Yeni bir hayata açılan kapılar</h2>
-            <p>Uzmanlarımız tarafından doğrulanmış, size özel seçilen ilanlar.</p>
+            <h2>Aktif Portföyümüz</h2>
+            <p>Uzmanlarımız tarafından doğrulanmış, size özel seçilen güncel satılık ve kiralık ilanlar.</p>
           </div>
           <div className="market-note">
             <span>Canlı Portföy</span>
