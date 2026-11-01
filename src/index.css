@@ -337,7 +337,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 
 .deal-eids-pill {
-  color: #15803d;
+  color: var(--purple);
   font-size: 11px;
   font-weight: 600;
   display: flex;
@@ -560,8 +560,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .detail-page { padding: 108px 4.5% 90px; max-width: 1400px; margin: auto; }
 .breadcrumbs { display: flex; align-items: center; gap: 7px; color: #64748b; font-size: 12px; margin: 12px 0 20px; flex-wrap: wrap; }
-.breadcrumbs button { border: 0; background: none; padding: 0; color: #2563eb; font-weight: 500; font-size: 12px; cursor: pointer; }
-.breadcrumbs button:hover { text-decoration: underline; }
+.breadcrumbs button { border: 0; background: none; padding: 0; color: var(--purple); font-weight: 500; font-size: 12px; cursor: pointer; }
+.breadcrumbs button:hover { text-decoration: underline; color: var(--red); }
 .detail-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 22px; }
 .detail-title-row h1 { font: 800 clamp(20px, 2.3vw, 30px)/1.25 'Manrope'; color: #0f172a; margin: 0; letter-spacing: -0.02em; }
 .detail-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -634,9 +634,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   opacity: 0.95;
 }
 .gallery-vthumb-item.active {
-  border-color: #2563eb;
+  border-color: var(--purple);
   opacity: 1;
-  box-shadow: 0 0 0 1px #2563eb;
+  box-shadow: 0 0 0 1.5px var(--purple);
 }
 .gallery-vthumb-item img {
   width: 100%;
@@ -718,7 +718,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   border-radius: 6px;
   cursor: pointer;
 }
-.gallery-action-bar button:hover { color: #2563eb; background: rgba(37, 99, 235, 0.08); }
+.gallery-action-bar button:hover { color: var(--purple); background: var(--purple-soft); }
 
 .gallery-sub-links {
   display: flex;
@@ -733,7 +733,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .gallery-sub-links button {
   border: 0;
   background: none;
-  color: #2563eb;
+  color: var(--purple);
   font-weight: 600;
   font-size: 12px;
   display: inline-flex;
@@ -741,7 +741,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   gap: 5px;
   cursor: pointer;
 }
-.gallery-sub-links button:hover { text-decoration: underline; color: #1d4ed8; }
+.gallery-sub-links button:hover { text-decoration: underline; color: var(--purple-dark); }
 
 /* Danışman Card - Sol Alt Tarafta */
 .agent-in-left-col {
@@ -757,8 +757,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .agent-badge-official {
   align-self: flex-start;
   font: 700 11px/1 'Manrope';
-  color: #1e40af;
-  background: #dbeafe;
+  color: var(--purple);
+  background: var(--purple-soft);
   padding: 5px 10px;
   border-radius: 4px;
   letter-spacing: 0.03em;
@@ -790,11 +790,11 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .agent-cert-pill {
   font-size: 11px;
   font-weight: 700;
-  color: #059669;
-  background: #ecfdf5;
+  color: var(--purple);
+  background: var(--purple-soft);
   padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid rgba(75, 44, 120, 0.2);
 }
 .agent-agency {
   display: block;
@@ -837,7 +837,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #16a34a;
+  background: var(--purple);
   color: white;
   border-radius: 8px;
   font-size: 12.5px;
@@ -846,7 +846,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   transition: background 0.15s ease;
 }
 .agent-wa-btn:hover {
-  background: #15803d;
+  background: var(--purple-dark);
 }
 
 /* Right Column: Price & Specs Table */
@@ -865,7 +865,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 .sahibinden-price-card strong {
   font: 800 clamp(24px, 2.5vw, 34px) 'Manrope';
-  color: #1e3a8a;
+  color: var(--purple);
   letter-spacing: -0.02em;
 }
 .sahibinden-location-sub {
@@ -877,7 +877,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .kredi-teklif-btn {
   border: 1px solid #cbd5e1;
   background: #f8fafc;
-  color: #2563eb;
+  color: var(--purple);
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 12px;
@@ -886,8 +886,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   transition: all 0.15s ease;
 }
 .kredi-teklif-btn:hover {
-  background: #eff6ff;
-  border-color: #93c5fd;
+  background: var(--purple-soft);
+  border-color: rgba(75, 44, 120, 0.25);
 }
 
 /* Sahibinden Specification Table */
@@ -943,7 +943,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 .spec-eid-verified {
   font-size: 10px;
-  background: #10b981;
+  background: var(--purple);
   color: white;
   padding: 2px 6px;
   border-radius: 4px;
@@ -958,17 +958,17 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .detail-tabs-nav {
   display: flex;
   gap: 6px;
-  border-bottom: 3px solid #f59e0b;
+  border-bottom: 3px solid var(--purple);
   margin-bottom: 0;
   overflow-x: auto;
 }
 .detail-tab-btn {
-  padding: 12px 24px;
-  border: 1px solid #cbd5e1;
+  padding: 12px 26px;
+  border: 1px solid var(--line);
   border-bottom: 0;
   border-radius: 8px 8px 0 0;
-  background: #f1f5f9;
-  color: #1e40af;
+  background: #f8fafc;
+  color: var(--muted);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -976,18 +976,19 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   white-space: nowrap;
 }
 .detail-tab-btn:hover {
-  background: #e2e8f0;
+  background: var(--purple-soft);
+  color: var(--purple);
 }
 .detail-tab-btn.active {
-  background: #f59e0b;
-  color: #0f172a;
-  border-color: #f59e0b;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  background: var(--purple);
+  color: #ffffff;
+  border-color: var(--purple);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25);
 }
 
 .detail-tab-pane {
   background: white;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--line);
   border-top: 0;
   border-radius: 0 0 12px 12px;
   padding: 32px;
@@ -1030,7 +1031,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   color: #1e293b;
 }
 .tab-feature-check {
-  color: #10b981;
+  color: var(--purple);
   font-weight: 800;
   font-size: 14px;
 }
@@ -1067,12 +1068,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   cursor: pointer;
 }
 .m2-toggle-btn.active {
-  background: #fef3c7;
-  border-color: #f59e0b;
-  color: #92400e;
+  background: var(--purple-soft);
+  border-color: var(--purple);
+  color: var(--purple);
 }
 .m2-tag-new {
-  background: #ef4444;
+  background: var(--red);
   color: white;
   font-size: 9px;
   font-weight: 800;
@@ -1084,12 +1085,16 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  background: #2563eb;
+  background: var(--purple);
   color: white;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
+  transition: background 0.15s ease;
+}
+.how-to-go-btn:hover {
+  background: var(--purple-dark);
 }
 .map-view-toggle {
   display: inline-flex;
@@ -1144,9 +1149,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   transition: all 0.15s ease;
 }
 .nearby-pill-btn.active {
-  background: #f59e0b;
-  border-color: #f59e0b;
-  color: #0f172a;
+  background: var(--purple);
+  border-color: var(--purple);
+  color: white;
 }
 .nearby-items-grid {
   display: grid;
@@ -1212,7 +1217,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   color: #475569;
 }
 .duration-pills button.active, .currency-pills button.active {
-  background: #2563eb;
+  background: var(--purple);
   color: white;
 }
 
@@ -1247,8 +1252,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #ecfdf5;
-  color: #059669;
+  background: rgba(236, 54, 49, 0.08);
+  color: var(--red);
   font-size: 13px;
   font-weight: 800;
   padding: 3px 8px;
@@ -1271,9 +1276,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   border-radius: 50%;
   margin-right: 6px;
 }
-.legend-ankara { background: #f59e0b; }
-.legend-kecioren { background: #3b82f6; }
-.legend-mahalle { background: #1e40af; }
+.legend-ankara { background: #8c8594; }
+.legend-kecioren { background: var(--red); }
+.legend-mahalle { background: var(--purple); }
 
 .endeks-chart-container {
   position: relative;
@@ -1448,19 +1453,19 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   padding: 4px 8px;
   background: rgba(23, 21, 29, 0.85);
   backdrop-filter: blur(4px);
-  color: #a7f3d0;
+  color: #ffffff;
   border-radius: 6px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  border: 1px solid rgba(167, 243, 208, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .eids-verified-text {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  color: #059669 !important;
+  color: var(--purple) !important;
   font-weight: 700;
   font-size: 10px;
 }
@@ -1470,23 +1475,23 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  background: var(--purple-soft);
+  border: 1px solid rgba(75, 44, 120, 0.2);
   border-radius: 20px;
   font-size: 12px;
-  color: #065f46;
+  color: var(--purple);
 }
 
 .eids-pill-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  background: var(--purple);
+  box-shadow: 0 0 0 3px rgba(75, 44, 120, 0.2);
 }
 
 .eids-verified-tag {
-  background: #10b981;
+  background: var(--purple);
   color: white;
   padding: 1px 7px;
   border-radius: 10px;
@@ -1495,18 +1500,18 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
 }
 
 .eids-law-notice {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: #f8fafc;
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 12px;
-  color: #92400e;
+  color: var(--ink);
   line-height: 1.5;
 }
 
 .eids-notice-badge {
   display: inline-block;
-  background: #d97706;
+  background: var(--red);
   color: white;
   padding: 2px 6px;
   border-radius: 4px;
@@ -1841,7 +1846,7 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   border: 0;
   background: none;
   padding: 0;
-  color: #2563eb;
+  color: var(--purple);
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -1885,12 +1890,12 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
 .auth-forgot-link {
   border: 0;
   background: none;
-  color: #2563eb;
+  color: var(--purple);
   font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
 }
-.auth-forgot-link:hover { text-decoration: underline; }
+.auth-forgot-link:hover { text-decoration: underline; color: var(--red); }
 
 .auth-demo-box {
   margin-top: 14px;
@@ -1922,9 +1927,9 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   transition: all 0.15s ease;
 }
 .auth-demo-pill:hover {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1d4ed8;
+  background: var(--purple-soft);
+  border-color: rgba(75, 44, 120, 0.25);
+  color: var(--purple);
 }
 
 /* Right Column Pitch */
@@ -2004,8 +2009,8 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
 .user-type-tag {
   font-size: 10px;
   font-weight: 700;
-  color: #1e40af;
-  background: #dbeafe;
+  color: var(--purple);
+  background: var(--purple-soft);
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -2041,9 +2046,9 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+  background: var(--purple-soft);
+  color: var(--purple);
+  border: 1px solid rgba(75, 44, 120, 0.2);
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 10.5px;
@@ -2087,8 +2092,8 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   transition: all 0.15s ease;
 }
 .dropdown-action-btn:hover {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--purple-soft);
+  color: var(--purple);
 }
 .dropdown-logout-btn {
   width: 100%;
@@ -2136,7 +2141,7 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #10b981;
+  background: var(--purple);
   color: white;
   display: grid;
   place-items: center;

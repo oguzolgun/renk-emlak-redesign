@@ -1810,7 +1810,7 @@ function DetailPage({
                         <Icon name={item.icon as any} size={16} />
                       </span>
                       <div className="nearby-item-info">
-                        <strong>{item.title} · <span style={{ color: '#2563eb' }}>{item.dist}</span></strong>
+                        <strong>{item.title} · <span style={{ color: 'var(--purple)', fontWeight: 700 }}>{item.dist}</span></strong>
                         <span>{item.desc}</span>
                       </div>
                     </div>
@@ -1893,8 +1893,8 @@ function DetailPage({
                 <svg viewBox={`0 0 ${svgW} ${svgH}`} className="endeks-chart-svg">
                   <defs>
                     <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.32" />
-                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.01" />
+                      <stop offset="0%" stopColor="#4b2c78" stopOpacity="0.22" />
+                      <stop offset="100%" stopColor="#4b2c78" stopOpacity="0.01" />
                     </linearGradient>
                   </defs>
 
@@ -1915,14 +1915,14 @@ function DetailPage({
                   {/* Shaded Area under Neighborhood Curve */}
                   <path d={neighborhoodArea} fill="url(#areaGradient)" />
 
-                  {/* City Trend Line (dashed orange/yellow) */}
-                  <path d={cityPath} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="5 4" />
+                  {/* City Trend Line (dashed neutral slate) */}
+                  <path d={cityPath} fill="none" stroke="#8c8594" strokeWidth="2" strokeDasharray="5 4" />
 
-                  {/* District Trend Line (dashed sky blue) */}
-                  <path d={districtPath} fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 3" />
+                  {/* District Trend Line (dashed Renk red) */}
+                  <path d={districtPath} fill="none" stroke="#ec3631" strokeWidth="2" strokeDasharray="4 3" />
 
-                  {/* Neighborhood Line (solid sapphire blue) */}
-                  <path d={neighborhoodPath} fill="none" stroke="#1d4ed8" strokeWidth="3" />
+                  {/* Neighborhood Line (solid Renk purple) */}
+                  <path d={neighborhoodPath} fill="none" stroke="#4b2c78" strokeWidth="3" />
 
                   {/* Data Points on Neighborhood Line */}
                   {trend.map((t, idx) => {
@@ -1931,8 +1931,8 @@ function DetailPage({
                     const isHovered = hoveredMonthIdx === idx
                     return (
                       <g key={idx} onMouseEnter={() => setHoveredMonthIdx(idx)} onMouseLeave={() => setHoveredMonthIdx(null)}>
-                        <circle cx={cx} cy={cy} r={isHovered ? 7 : 4} fill="#1d4ed8" stroke="white" strokeWidth={isHovered ? 3 : 2} style={{ cursor: 'pointer', transition: 'all 0.15s ease' }} />
-                        <text x={cx} y={padT + chartH + 20} textAnchor="middle" fontSize="11" fill={isHovered ? '#0f172a' : '#64748b'} fontWeight={isHovered ? '700' : '500'} fontFamily="DM Sans">
+                        <circle cx={cx} cy={cy} r={isHovered ? 7 : 4} fill="#4b2c78" stroke="white" strokeWidth={isHovered ? 3 : 2} style={{ cursor: 'pointer', transition: 'all 0.15s ease' }} />
+                        <text x={cx} y={padT + chartH + 20} textAnchor="middle" fontSize="11" fill={isHovered ? '#17151d' : '#64748b'} fontWeight={isHovered ? '700' : '500'} fontFamily="DM Sans">
                           {t.month}
                         </text>
                       </g>
@@ -1966,7 +1966,7 @@ function DetailPage({
                 </div>
                 <div className="endeks-mini-card">
                   <small>Bölge Yatırım Skoru</small>
-                  <strong style={{ color: '#059669' }}>8.9 / 10 (Yüksek Prim)</strong>
+                  <strong style={{ color: 'var(--purple)' }}>8.9 / 10 (Yüksek Prim)</strong>
                 </div>
               </div>
             </div>
@@ -2036,7 +2036,7 @@ function DetailPage({
                     padding: 0,
                     borderRadius: '6px',
                     overflow: 'hidden',
-                    border: activeImageIndex === idx ? '2px solid #f59e0b' : '2px solid transparent',
+                    border: activeImageIndex === idx ? '2px solid var(--purple)' : '2px solid transparent',
                     opacity: activeImageIndex === idx ? 1 : 0.6,
                     cursor: 'pointer',
                   }}
@@ -2682,8 +2682,8 @@ function ConsultationModal({
               style={{
                 width: '60px',
                 height: '60px',
-                backgroundColor: 'rgba(37, 211, 102, 0.15)',
-                color: '#25D366',
+                backgroundColor: 'rgba(75, 44, 120, 0.12)',
+                color: 'var(--purple)',
                 borderRadius: '50%',
                 display: 'grid',
                 placeItems: 'center',
@@ -2767,7 +2767,7 @@ function ConsultationModal({
               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', fontWeight: 600 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>Taşınmaz Numarası (EİD) <span style={{ color: 'var(--red)' }}>* Zorunlu</span></span>
-                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>EİDS Doğrulama ✓</span>
+                  <span style={{ fontSize: '11px', color: 'var(--purple)', fontWeight: 600 }}>EİDS Doğrulama ✓</span>
                 </div>
                 <input
                   required
