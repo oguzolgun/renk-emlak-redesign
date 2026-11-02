@@ -833,11 +833,15 @@ function FeaturedDealsSection({
     }
   }, [featuredDeals])
 
+  const touchStartXRef = useRef(0)
+  const isTouchScrollingRef = useRef(false)
+
   const scrollCarousel = (direction: 'left' | 'right') => {
     const el = trackRef.current
     if (!el) return
-    const amount = 380
-    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' })
+    const card = el.querySelector<HTMLElement>('.featured-deal-card')
+    const step = card ? card.offsetWidth + 14 : (window.innerWidth < 768 ? 290 : 374)
+    el.scrollBy({ left: direction === 'left' ? -step : step, behavior: 'smooth' })
   }
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -868,6 +872,28 @@ function FeaturedDealsSection({
       setMoved(true)
     }
     el.scrollLeft = scrollLeftPos - walk
+  }
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = e.touches[0].clientX
+    isTouchScrollingRef.current = false
+  }
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const diff = Math.abs(e.touches[0].clientX - touchStartXRef.current)
+    if (diff > 8) {
+      isTouchScrollingRef.current = true
+      setMoved(true)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (isTouchScrollingRef.current) {
+      setTimeout(() => {
+        setMoved(false)
+        isTouchScrollingRef.current = false
+      }, 150)
+    }
   }
 
   const getDealBadge = (deal: Listing, idx: number) => {
@@ -935,13 +961,16 @@ function FeaturedDealsSection({
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {featuredDeals.map((deal, idx) => (
             <article
               key={deal.id}
               className="featured-deal-card"
               onClick={() => {
-                if (!moved) onOpen(deal)
+                if (!moved && !isTouchScrollingRef.current) onOpen(deal)
               }}
             >
               <div className="deal-card-media">
@@ -1247,6 +1276,28 @@ function DetailPage({
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<'details' | 'location' | 'index'>('details')
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+  const thumbsRef = useRef<HTMLDivElement>(null)
+  const touchGalleryStartXRef = useRef(0)
+
+  useEffect(() => {
+    if (thumbsRef.current && thumbsRef.current.children[activeImageIndex]) {
+      const thumbNode = thumbsRef.current.children[activeImageIndex] as HTMLElement
+      thumbNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+  }, [activeImageIndex])
+
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    touchGalleryStartXRef.current = e.touches[0].clientX
+  }
+
+  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
+    const diff = e.changedTouches[0].clientX - touchGalleryStartXRef.current
+    if (diff > 45) {
+      setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
+    } else if (diff < -45) {
+      setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
+    }
+  }
 
   // Location tab states
   const [showM2Map, setShowM2Map] = useState(false)
@@ -1391,7 +1442,7 @@ function DetailPage({
             <div className="sahibinden-gallery-row">
               {/* Vertical Thumbnails on the LEFT */}
               {images.length > 1 && (
-                <div className="gallery-vertical-thumbs">
+                <div className="gallery-vertical-thumbs" ref={thumbsRef}>
                   {images.map((img, idx) => (
                     <button
                       key={idx}
@@ -1406,7 +1457,11 @@ function DetailPage({
               )}
 
               {/* Main Display Frame on the RIGHT */}
-              <div className="gallery-main-frame">
+              <div
+                className="gallery-main-frame"
+                onTouchStart={handleGalleryTouchStart}
+                onTouchEnd={handleGalleryTouchEnd}
+              >
                 <img
                   src={images[activeImageIndex]}
                   alt={listing.title}
@@ -2015,7 +2070,10 @@ function DetailPage({
               maxHeight: '80vh',
               objectFit: 'contain',
               borderRadius: '8px',
+              touchAction: 'pan-y',
             }}
+            onTouchStart={handleGalleryTouchStart}
+            onTouchEnd={handleGalleryTouchEnd}
             onClick={(e) => e.stopPropagation()}
           />
 
