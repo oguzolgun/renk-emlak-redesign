@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { listings, type Listing } from './listingsData'
+import { AboutPage } from './pages/AboutPage'
+import { BranchesPage } from './pages/BranchesPage'
+import { ContactPage } from './pages/ContactPage'
+import { BlogPage } from './pages/BlogPage'
+
+export type ActiveView = 'home' | 'about' | 'branches' | 'contact' | 'blog'
 
 const Icon = ({
   name,
@@ -316,13 +322,15 @@ const saveRegisteredUser = (user: AuthUser) => {
 function Header({
   onHome,
   onNavigate,
+  activeView,
   onOpenConsultation,
   onOpenAuth,
   currentUser,
   onLogout,
 }: {
   onHome: () => void
-  onNavigate: (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => void
+  onNavigate: (view: ActiveView, tab?: 'Satılık' | 'Kiralık' | 'Proje') => void
+  activeView: ActiveView
   onOpenConsultation: () => void
   onOpenAuth: (mode: 'login' | 'register') => void
   currentUser: AuthUser | null
@@ -338,10 +346,41 @@ function Header({
       </button>
 
       <nav className="main-nav" aria-label="Ana menü">
-        <button onClick={() => onNavigate('Satılık')}>Satılık</button>
-        <button onClick={() => onNavigate('Kiralık')}>Kiralık</button>
-        <button onClick={() => onNavigate('Projeler')}>Projeler</button>
-        <button onClick={() => onNavigate('Kurumsal')}>Kurumsal</button>
+        <button
+          className={activeView === 'home' ? 'active' : ''}
+          onClick={() => onNavigate('home', 'Satılık')}
+        >
+          Satılık
+        </button>
+        <button
+          onClick={() => onNavigate('home', 'Kiralık')}
+        >
+          Kiralık
+        </button>
+        <button
+          className={activeView === 'about' ? 'active' : ''}
+          onClick={() => onNavigate('about')}
+        >
+          Hakkımızda
+        </button>
+        <button
+          className={activeView === 'branches' ? 'active' : ''}
+          onClick={() => onNavigate('branches')}
+        >
+          Şubelerimiz
+        </button>
+        <button
+          className={activeView === 'blog' ? 'active' : ''}
+          onClick={() => onNavigate('blog')}
+        >
+          Blog & Rehber
+        </button>
+        <button
+          className={activeView === 'contact' ? 'active' : ''}
+          onClick={() => onNavigate('contact')}
+        >
+          İletişim
+        </button>
       </nav>
 
       <div className="header-actions">
@@ -455,7 +494,7 @@ function Header({
           <button
             onClick={() => {
               setMobileMenuOpen(false)
-              onNavigate('Satılık')
+              onNavigate('home', 'Satılık')
             }}
           >
             Satılık İlanlar
@@ -463,7 +502,7 @@ function Header({
           <button
             onClick={() => {
               setMobileMenuOpen(false)
-              onNavigate('Kiralık')
+              onNavigate('home', 'Kiralık')
             }}
           >
             Kiralık İlanlar
@@ -471,18 +510,34 @@ function Header({
           <button
             onClick={() => {
               setMobileMenuOpen(false)
-              onNavigate('Projeler')
+              onNavigate('about')
             }}
           >
-            Projeler & Ticari
+            Hakkımızda & Tarihçe
           </button>
           <button
             onClick={() => {
               setMobileMenuOpen(false)
-              onNavigate('Kurumsal')
+              onNavigate('branches')
             }}
           >
-            Kurumsal & İletişim
+            Şubelerimiz & Temsilcilikler
+          </button>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('blog')
+            }}
+          >
+            Emlak Blogu & Rehber
+          </button>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false)
+              onNavigate('contact')
+            }}
+          >
+            İletişim & Ulaşım
           </button>
           <div className="mobile-menu-divider" />
           {currentUser ? (
@@ -2909,7 +2964,13 @@ function ConsultationModal({
   )
 }
 
-function Footer() {
+function Footer({
+  onNavigate,
+  onOpenConsultation,
+}: {
+  onNavigate: (view: ActiveView, tab?: 'Satılık' | 'Kiralık' | 'Proje') => void
+  onOpenConsultation: () => void
+}) {
   return (
     <footer>
       <div className="footer-brand">
@@ -2919,49 +2980,67 @@ function Footer() {
           <br />
           hayallerinize renk katıyoruz.
         </p>
+        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <span className="eid-pill" style={{ fontSize: '11px', padding: '4px 8px' }}>
+            Yetki Belge: 0600124
+          </span>
+          <span className="eid-pill" style={{ fontSize: '11px', padding: '4px 8px' }}>
+            EİDS Doğrulamalı
+          </span>
+        </div>
       </div>
       <div>
-        <strong>Keşfet</strong>
-        <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+        <strong>Portföy & Keşif</strong>
+        <button onClick={() => onNavigate('home', 'Satılık')}>
           Satılık İlanlar
         </button>
-        <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+        <button onClick={() => onNavigate('home', 'Kiralık')}>
           Kiralık İlanlar
         </button>
-        <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+        <button onClick={() => onNavigate('home', 'Proje')}>
           Yeni Projeler
+        </button>
+        <button onClick={onOpenConsultation}>
+          Ücretsiz İlan Danışmanlığı
         </button>
       </div>
       <div>
-        <strong>Renk Emlak</strong>
-        <button onClick={() => document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })}>
-          Hakkımızda
+        <strong>Kurumsal</strong>
+        <button onClick={() => onNavigate('about')}>
+          Hakkımızda & 1987 Tarihçe
         </button>
-        <button onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-          Danışmanlarımız
+        <button onClick={() => onNavigate('branches')}>
+          Şubelerimiz (Keçiören & Etlik)
         </button>
-        <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>
-          İletişim
+        <button onClick={() => onNavigate('blog')}>
+          Emlak Blogu & Rehber
+        </button>
+        <button onClick={() => onNavigate('contact')}>
+          İletişim & Ulaşım
         </button>
       </div>
       <div className="footer-contact">
-        <strong>Bize ulaşın</strong>
+        <strong>Bize Ulaşın</strong>
         <a href="tel:03123521515" style={{ color: 'inherit', textDecoration: 'none' }}>
-          <span>+90 312 352 15 15</span>
+          <span>+90 (312) 352 15 15</span>
+        </a>
+        <a href="https://wa.me/905356657542" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+          <span>WhatsApp: +90 (535) 665 75 42</span>
         </a>
         <a href="mailto:info@renkemlak.com" style={{ color: 'inherit', textDecoration: 'none' }}>
           <span>info@renkemlak.com</span>
         </a>
         <small style={{ color: 'var(--muted)', marginTop: '4px' }}>
-          Etlik Aşağı Eğlence Mah. Giresun Cad. Sazan Cad. No:4 Keçiören / Ankara
+          Etlik Aşağı Eğlence Mah. Giresun Cad. Sazan Sok. No:4/D Keçiören / Ankara
         </small>
       </div>
-      <small>© 2026 Renk Emlak. Tüm hakları saklıdır.</small>
+      <small>© 2026 Renk Emlak. Tüm hakları saklıdır. T.C. Ticaret Bakanlığı Taşınmaz Ticareti Yetki Belgesi: 0600124</small>
     </footer>
   )
 }
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<ActiveView>('home')
   const [selected, setSelected] = useState<Listing | null>(null)
   const [filterStatus, setFilterStatus] = useState<'Satılık' | 'Kiralık' | 'Proje'>('Satılık')
   const [savedIds, setSavedIds] = useState<Set<number>>(() => new Set())
@@ -2999,25 +3078,20 @@ export default function App() {
 
   const goHome = () => {
     setSelected(null)
+    setCurrentView('home')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleNavigate = (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => {
+  const handleNavigate = (view: ActiveView, tab?: 'Satılık' | 'Kiralık' | 'Proje') => {
     setSelected(null)
-    setTimeout(() => {
-      if (tab === 'Satılık') {
-        setFilterStatus('Satılık')
+    setCurrentView(view)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (view === 'home' && tab) {
+      setFilterStatus(tab)
+      setTimeout(() => {
         document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-      } else if (tab === 'Kiralık') {
-        setFilterStatus('Kiralık')
-        document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-      } else if (tab === 'Projeler') {
-        setFilterStatus('Proje')
-        document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-      } else if (tab === 'Kurumsal') {
-        document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })
-      }
-    }, 60)
+      }, 70)
+    }
   }
 
   const handleLoginSuccess = (user: AuthUser, message: string) => {
@@ -3036,6 +3110,7 @@ export default function App() {
       <Header
         onHome={goHome}
         onNavigate={handleNavigate}
+        activeView={currentView}
         onOpenConsultation={() => setConsultationOpen(true)}
         onOpenAuth={(mode) => setAuthModal({ isOpen: true, mode })}
         currentUser={currentUser}
@@ -3049,6 +3124,14 @@ export default function App() {
           onToggleSave={toggleSave}
           onOpenConsultation={() => setConsultationOpen(true)}
         />
+      ) : currentView === 'about' ? (
+        <AboutPage onBackToHome={goHome} onOpenConsultation={() => setConsultationOpen(true)} />
+      ) : currentView === 'branches' ? (
+        <BranchesPage onBackToHome={goHome} onOpenConsultation={() => setConsultationOpen(true)} />
+      ) : currentView === 'contact' ? (
+        <ContactPage onBackToHome={goHome} onOpenConsultation={() => setConsultationOpen(true)} />
+      ) : currentView === 'blog' ? (
+        <BlogPage onBackToHome={goHome} onOpenConsultation={() => setConsultationOpen(true)} />
       ) : (
         <HomePage
           onOpen={openListing}
@@ -3058,7 +3141,7 @@ export default function App() {
           onToggleSave={toggleSave}
         />
       )}
-      <Footer />
+      <Footer onNavigate={handleNavigate} onOpenConsultation={() => setConsultationOpen(true)} />
       {consultationOpen && (
         <ConsultationModal
           onClose={() => setConsultationOpen(false)}
