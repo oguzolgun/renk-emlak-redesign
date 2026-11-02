@@ -538,7 +538,11 @@ function Hero({ onExplore }: { onExplore: () => void }) {
     }
     update()
     window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   return (
@@ -570,7 +574,14 @@ function Hero({ onExplore }: { onExplore: () => void }) {
           </button>
         </div>
 
-        <div className="scroll-cue">
+        <div
+          className="scroll-cue"
+          onClick={onExplore}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+          aria-label="Fırsatları görmek için kaydırın"
+        >
           <span>Keşfetmek için kaydırın</span>
           <b>
             <i />
@@ -2993,18 +3004,20 @@ export default function App() {
 
   const handleNavigate = (tab: 'Satılık' | 'Kiralık' | 'Projeler' | 'Kurumsal') => {
     setSelected(null)
-    if (tab === 'Satılık') {
-      setFilterStatus('Satılık')
-      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-    } else if (tab === 'Kiralık') {
-      setFilterStatus('Kiralık')
-      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-    } else if (tab === 'Projeler') {
-      setFilterStatus('Proje')
-      document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
-    } else if (tab === 'Kurumsal') {
-      document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })
-    }
+    setTimeout(() => {
+      if (tab === 'Satılık') {
+        setFilterStatus('Satılık')
+        document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+      } else if (tab === 'Kiralık') {
+        setFilterStatus('Kiralık')
+        document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+      } else if (tab === 'Projeler') {
+        setFilterStatus('Proje')
+        document.querySelector('#listings')?.scrollIntoView({ behavior: 'smooth' })
+      } else if (tab === 'Kurumsal') {
+        document.querySelector('#kurumsal')?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 60)
   }
 
   const handleLoginSuccess = (user: AuthUser, message: string) => {

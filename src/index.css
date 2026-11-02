@@ -21,21 +21,31 @@
 * { box-sizing: border-box; }
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
-  max-width: 100vw;
 }
 body {
   margin: 0;
   min-width: 320px;
   background: var(--canvas);
-  overflow-x: hidden;
-  max-width: 100vw;
+  overflow-x: clip;
+  width: 100%;
+  position: relative;
+}
+.app {
+  overflow-x: clip;
   width: 100%;
   position: relative;
 }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(75, 44, 120, .3); outline-offset: 2px; }
+
+/* Global Anchor Scroll Margin for Fixed Header */
+#featured-deals,
+#listings,
+#kurumsal,
+.detail-tabs-section {
+  scroll-margin-top: 90px;
+}
 
 .site-header {
   position: fixed; z-index: 50; top: 0; left: 0; right: 0; height: 82px; padding: 0 4.5%;
@@ -58,8 +68,19 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .primary-button { padding: 13px 20px; font-size: 13px; }
 .primary-button:hover, .hero-cta:hover, .search-button:hover, .call-button:hover { background: var(--red-dark); transform: translateY(-1px); }
 
-.hero-scroll { height: 250vh; }
-.hero-sticky { position: sticky; top: 0; height: 100vh; min-height: 640px; overflow: hidden; background: #120e18; }
+.hero-scroll {
+  height: 155vh;
+  position: relative;
+  background: #120e18;
+}
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+  background: #120e18;
+}
 .hero-image { position: absolute; inset: 0; background: center 55%/cover no-repeat url('/hero-image.jpg'); }
 .hero-muted { filter: grayscale(100%) contrast(1.05) brightness(0.8); }
 .hero-color { filter: saturate(1.45) contrast(1.1) brightness(1.06); transition: opacity 0.06s linear; }
@@ -1433,7 +1454,7 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   .primary-button { padding: 9px 12px; font-size: 12px; white-space: nowrap; }
 
   /* Hero Mobile */
-  .hero-scroll { height: 140vh; }
+  .hero-scroll { height: 125vh; }
   .hero-sticky { height: 100dvh; min-height: 520px; }
   .hero-content { left: 5%; right: 5%; top: 48%; transform: translateY(-46%); }
   .hero-content h1 { font-size: clamp(30px, 8.5vw, 42px); line-height: 1.1; margin: 10px 0 14px; }
@@ -1442,6 +1463,13 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   .scroll-cue { bottom: 16px; font-size: 9px; gap: 6px; }
   .scroll-cue b { width: 18px; height: 28px; padding-top: 5px; }
   .color-meter { display: none; }
+
+  #featured-deals,
+  #listings,
+  #kurumsal,
+  .detail-tabs-section {
+    scroll-margin-top: 75px;
+  }
 
   /* Featured Deals Carousel Mobile Full-Bleed */
   .featured-deals-section { padding: 36px 0 20px; }
