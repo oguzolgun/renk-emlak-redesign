@@ -106,21 +106,33 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .primary-button:hover, .hero-cta:hover, .search-button:hover, .call-button:hover { background: var(--red-dark); transform: translateY(-1px); }
 
 .hero-scroll {
-  height: 155vh;
-  position: relative;
-  background: #120e18;
-}
-.hero-sticky {
-  position: sticky;
-  top: 0;
   height: 100vh;
   min-height: 600px;
+  position: relative;
+  background: #120e18;
+  overflow: hidden;
+}
+.hero-sticky {
+  position: relative;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
   background: #120e18;
 }
 .hero-image { position: absolute; inset: 0; background: center 55%/cover no-repeat url('/hero-image.jpg'); }
-.hero-muted { filter: grayscale(100%) contrast(1.05) brightness(0.8); }
-.hero-color { filter: saturate(1.45) contrast(1.1) brightness(1.06); transition: opacity 0.06s linear; }
+.hero-muted {
+  filter: grayscale(100%) contrast(1.05) brightness(0.82);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease;
+}
+.hero-color {
+  filter: saturate(1.48) contrast(1.12) brightness(1.06);
+  opacity: 0;
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s ease;
+  will-change: opacity, transform;
+}
+.hero-color.colored {
+  opacity: 1;
+}
 .hero-shade {
   position: absolute;
   inset: 0;
@@ -1516,8 +1528,8 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
   }
 
   /* Hero Mobile */
-  .hero-scroll { height: 120vh; max-width: 100%; overflow: hidden; }
-  .hero-sticky { height: 100dvh; min-height: 480px; max-width: 100%; overflow: hidden; }
+  .hero-scroll { height: 100dvh; min-height: 500px; max-width: 100%; overflow: hidden; }
+  .hero-sticky { height: 100%; min-height: 100%; max-width: 100%; overflow: hidden; }
   .hero-content { left: 4%; right: 4%; top: 48%; transform: translateY(-46%); max-width: 92%; }
   .hero-content h1 { font-size: clamp(26px, 7.8vw, 36px); line-height: 1.12; margin: 8px 0 12px; }
   .hero-copy { font-size: 13px; line-height: 1.5; margin-bottom: 16px; }

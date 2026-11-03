@@ -581,33 +581,129 @@ function Header({
 }
 
 function Hero({ onExplore }: { onExplore: () => void }) {
-  const [progress, setProgress] = useState(0)
+  const [isColored, setIsColored] = useState(false)
+  const isColoredRef = useRef(false)
+  const canAdvanceRef = useRef(false)
+  const isTransitioningRef = useRef(false)
+  const touchStartY = useRef(0)
 
   useEffect(() => {
-    const update = () => {
-      const hero = document.querySelector('.hero-scroll')
-      if (!hero) return
-      const rect = hero.getBoundingClientRect()
-      const distance = hero.clientHeight - window.innerHeight
-      const raw = Math.min(1, Math.max(0, -rect.top / Math.max(distance, 1)))
-      setProgress(raw)
+    isColoredRef.current = isColored
+  }, [isColored])
+
+  // Reset to monochrome when user scrolls back to the very top
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY === 0) {
+        setIsColored(false)
+        canAdvanceRef.current = false
+        isTransitioningRef.current = false
+      } else if (window.scrollY > 40) {
+        setIsColored(true)
+      }
     }
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Two-step scroll interaction:
+  // 1st scroll when at top: Colorizes the house image
+  // 2nd scroll: Transitions to the lower sections
+  useEffect(() => {
+    let unlockTimer: any = null
+
+    const handleWheel = (e: WheelEvent) => {
+      if (window.scrollY <= 15 && e.deltaY > 5) {
+        if (!isColoredRef.current) {
+          // 1st scroll: Color opens up!
+          e.preventDefault()
+          setIsColored(true)
+          isColoredRef.current = true
+          isTransitioningRef.current = true
+          canAdvanceRef.current = false
+          clearTimeout(unlockTimer)
+          unlockTimer = setTimeout(() => {
+            canAdvanceRef.current = true
+            isTransitioningRef.current = false
+          }, 450)
+        } else if (canAdvanceRef.current) {
+          // 2nd scroll: Advance to lower sections!
+          e.preventDefault()
+          canAdvanceRef.current = false
+          onExplore()
+        } else if (isTransitioningRef.current) {
+          e.preventDefault()
+        }
+      }
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (window.scrollY <= 15) {
+        const deltaY = touchStartY.current - e.touches[0].clientY
+        if (deltaY > 20) {
+          if (!isColoredRef.current) {
+            // 1st swipe: Color opens up!
+            if (e.cancelable) e.preventDefault()
+            setIsColored(true)
+            isColoredRef.current = true
+            isTransitioningRef.current = true
+            canAdvanceRef.current = false
+            clearTimeout(unlockTimer)
+            unlockTimer = setTimeout(() => {
+              canAdvanceRef.current = true
+              isTransitioningRef.current = false
+            }, 450)
+          } else if (canAdvanceRef.current) {
+            // 2nd swipe: Advance to lower sections!
+            if (e.cancelable) e.preventDefault()
+            canAdvanceRef.current = false
+            onExplore()
+          } else if (isTransitioningRef.current) {
+            if (e.cancelable) e.preventDefault()
+          }
+        }
+      }
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      clearTimeout(unlockTimer)
+    }
+  }, [onExplore])
+
+  const handleCtaClick = () => {
+    setIsColored(true)
+    onExplore()
+  }
+
+  const handleCueClick = () => {
+    if (!isColored) {
+      setIsColored(true)
+      setTimeout(() => {
+        onExplore()
+      }, 350)
+    } else {
+      onExplore()
+    }
+  }
 
   return (
     <section className="hero-scroll">
       <div className="hero-sticky">
-        <div className="hero-image hero-muted" />
+        <div className={`hero-image hero-muted ${isColored ? 'colored' : ''}`} />
         <div
-          className="hero-image hero-color"
-          style={{ opacity: progress }}
+          className={`hero-image hero-color ${isColored ? 'colored' : ''}`}
+          style={{ opacity: isColored ? 1 : 0 }}
         />
         <div className="hero-shade" />
 
@@ -625,20 +721,20 @@ function Hero({ onExplore }: { onExplore: () => void }) {
             <br />
             Size iyi hissettirecek yaşam alanını birlikte keşfedelim.
           </p>
-          <button className="hero-cta" onClick={onExplore}>
+          <button className="hero-cta" onClick={handleCtaClick}>
             İlanları Keşfet <Icon name="arrow" />
           </button>
         </div>
 
         <div
           className="scroll-cue"
-          onClick={onExplore}
+          onClick={handleCueClick}
           style={{ cursor: 'pointer' }}
           role="button"
           tabIndex={0}
-          aria-label="Fırsatları görmek için kaydırın"
+          aria-label={isColored ? 'Fırsatları görmek için kaydırın' : 'Renklendirmek için kaydırın'}
         >
-          <span>Keşfetmek için kaydırın</span>
+          <span>{isColored ? 'Fırsatları görmek için kaydırın' : 'Renklendirmek için kaydırın'}</span>
           <b>
             <i />
           </b>
