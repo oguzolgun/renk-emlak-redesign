@@ -1442,10 +1442,35 @@ function DetailPage({
   const thumbsRef = useRef<HTMLDivElement>(null)
   const touchGalleryStartXRef = useRef(0)
 
+  // 1. İlan değiştiğinde veya sayfa açıldığında: Görseli ve sekmeyi sıfırla, anında en tepeye kaydır
   useEffect(() => {
-    if (thumbsRef.current && thumbsRef.current.children[activeImageIndex]) {
-      const thumbNode = thumbsRef.current.children[activeImageIndex] as HTMLElement
-      thumbNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    setActiveImageIndex(0)
+    setActiveTab('details')
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    if (thumbsRef.current) {
+      thumbsRef.current.scrollTop = 0
+      thumbsRef.current.scrollLeft = 0
+    }
+  }, [listing.id])
+
+  // 2. Sadece aktif thumbnail kutusunu kendi container'ı içinde kaydır (Pencereyi/sayfayı ASLA kaydırma!)
+  useEffect(() => {
+    if (!thumbsRef.current || !thumbsRef.current.children[activeImageIndex]) return
+    const container = thumbsRef.current
+    if (activeImageIndex === 0) {
+      container.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      return
+    }
+
+    const thumbNode = container.children[activeImageIndex] as HTMLElement
+    // Mobilde yatay, masaüstünde dikey kaydırma
+    const isMobile = window.innerWidth <= 768 || container.scrollWidth > container.clientWidth
+    if (isMobile) {
+      const targetLeft = thumbNode.offsetLeft - (container.clientWidth - thumbNode.clientWidth) / 2
+      container.scrollTo({ left: targetLeft, behavior: 'smooth' })
+    } else {
+      const targetTop = thumbNode.offsetTop - (container.clientHeight - thumbNode.clientHeight) / 2
+      container.scrollTo({ top: targetTop, behavior: 'smooth' })
     }
   }, [activeImageIndex])
 
@@ -1549,21 +1574,27 @@ function DetailPage({
 
   return (
     <main className="detail-page">
-      {/* Breadcrumb Navigation */}
-      <div className="breadcrumbs">
-        <button onClick={onBack}>Ana Sayfa</button>
-        <Icon name="chevron" size={13} />
-        <span>Emlak</span>
-        <Icon name="chevron" size={13} />
-        <span>Konut</span>
-        <Icon name="chevron" size={13} />
-        <button onClick={onBack}>{listing.type}</button>
-        <Icon name="chevron" size={13} />
-        <span>{listing.city}</span>
-        <Icon name="chevron" size={13} />
-        <span>{listing.district}</span>
-        <Icon name="chevron" size={13} />
-        <span>{listing.neighborhood}</span>
+      {/* Top Navigation & Breadcrumbs */}
+      <div className="detail-top-nav">
+        <button onClick={onBack} className="detail-back-button" title="Tüm İlanlara Dön">
+          <Icon name="chevronLeft" size={15} />
+          <span>Tüm İlanlara Dön</span>
+        </button>
+        <div className="breadcrumbs">
+          <button onClick={onBack}>Ana Sayfa</button>
+          <Icon name="chevron" size={13} />
+          <span>Emlak</span>
+          <Icon name="chevron" size={13} />
+          <span>Konut</span>
+          <Icon name="chevron" size={13} />
+          <button onClick={onBack}>{listing.type}</button>
+          <Icon name="chevron" size={13} />
+          <span>{listing.city}</span>
+          <Icon name="chevron" size={13} />
+          <span>{listing.district}</span>
+          <Icon name="chevron" size={13} />
+          <span>{listing.neighborhood}</span>
+        </div>
       </div>
 
       {/* Header Row: Title & Actions */}
@@ -2231,6 +2262,67 @@ function DetailPage({
           >
             <Icon name="close" size={32} />
           </button>
+
+          {images.length > 1 && (
+            <>
+              <button
+                className="gallery-nav-btn gallery-nav-prev"
+                style={{
+                  position: 'absolute',
+                  left: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 1000,
+                  width: '46px',
+                  height: '46px',
+                  fontSize: '24px',
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
+                }}
+                aria-label="Önceki fotoğraf"
+              >
+                ‹
+              </button>
+              <button
+                className="gallery-nav-btn gallery-nav-next"
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 1000,
+                  width: '46px',
+                  height: '46px',
+                  fontSize: '24px',
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
+                }}
+                aria-label="Sonraki fotoğraf"
+              >
+                ›
+              </button>
+            </>
+          )}
 
           <img
             src={images[activeImageIndex]}
@@ -3175,21 +3267,27 @@ export default function App() {
     })
   }
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+  }, [])
+
   const openListing = (listing: Listing) => {
     setSelected(listing)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }
 
   const goHome = () => {
     setSelected(null)
     setCurrentView('home')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }
 
   const handleNavigate = (view: ActiveView, tab?: 'Satılık' | 'Kiralık' | 'Proje') => {
     setSelected(null)
     setCurrentView(view)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
     if (view === 'home' && tab) {
       setFilterStatus(tab)
       setTimeout(() => {

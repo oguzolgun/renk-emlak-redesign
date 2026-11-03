@@ -641,7 +641,34 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 
 .detail-page { padding: 108px 4.5% 90px; max-width: 1400px; margin: auto; }
-.breadcrumbs { display: flex; align-items: center; gap: 7px; color: #64748b; font-size: 12px; margin: 12px 0 20px; flex-wrap: wrap; }
+.detail-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+.detail-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.detail-back-button:hover {
+  background: var(--purple);
+  color: #ffffff;
+  border-color: var(--purple);
+}
+.breadcrumbs { display: flex; align-items: center; gap: 7px; color: #64748b; font-size: 12px; margin: 0; flex-wrap: wrap; }
 .breadcrumbs button { border: 0; background: none; padding: 0; color: var(--purple); font-weight: 500; font-size: 12px; cursor: pointer; }
 .breadcrumbs button:hover { text-decoration: underline; color: var(--red); }
 .detail-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 22px; }
@@ -1588,8 +1615,9 @@ footer > small { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1)
 
   /* Detail Page Layout */
   .detail-page { padding: 78px 3.5% 50px; max-width: 100%; overflow: hidden; width: 100%; }
-  .detail-top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .breadcrumbs { margin: 4px 0 10px; font-size: 11px; gap: 4px; }
+  .detail-top-nav { margin: 4px 0 10px; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
+  .detail-back-button { font-size: 11.5px; padding: 5px 10px; }
+  .breadcrumbs { margin: 0; font-size: 11px; gap: 4px; }
   .detail-title-row { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 14px; }
   .detail-title-row h1 { font-size: 18px; line-height: 1.3; }
   .detail-actions { width: 100%; display: flex; gap: 6px; }
