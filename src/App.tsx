@@ -477,7 +477,8 @@ function Header({
         )}
 
         <button className="primary-button" onClick={onOpenConsultation}>
-          Ücretsiz İlan Ver
+          <span className="btn-desktop-txt">Ücretsiz İlan Ver</span>
+          <span className="btn-mobile-txt">İlan Ver</span>
         </button>
 
         <button
@@ -1480,10 +1481,13 @@ function DetailPage({
         </div>
         <div className="detail-actions">
           <button onClick={() => onToggleSave(listing.id)} style={{ color: isSaved ? 'var(--red)' : undefined }}>
-            <Icon name="heart" size={16} /> {isSaved ? 'Favorilerimde' : 'Favorilerime Ekle'}
+            <Icon name="heart" size={16} />
+            <span className="btn-desktop-txt">{isSaved ? 'Favorilerimde' : 'Favorilerime Ekle'}</span>
+            <span className="btn-mobile-txt">{isSaved ? 'Favori' : 'Kaydet'}</span>
           </button>
           <button onClick={() => window.print()} title="İlanı Yazdır">
-            <Icon name="print" size={16} /> Yazdır
+            <Icon name="print" size={16} />
+            <span>Yazdır</span>
           </button>
           <button
             onClick={() => {
@@ -1495,7 +1499,8 @@ function DetailPage({
               }
             }}
           >
-            <Icon name="share" size={16} /> Paylaş
+            <Icon name="share" size={16} />
+            <span>Paylaş</span>
           </button>
         </div>
       </div>
@@ -1771,7 +1776,8 @@ function DetailPage({
             role="tab"
             aria-selected={activeTab === 'details'}
           >
-            İlan Detayları
+            <span className="tab-desktop-txt">İlan Detayları</span>
+            <span className="tab-mobile-txt">Detaylar</span>
           </button>
           <button
             className={`detail-tab-btn ${activeTab === 'location' ? 'active' : ''}`}
@@ -1779,7 +1785,8 @@ function DetailPage({
             role="tab"
             aria-selected={activeTab === 'location'}
           >
-            Konumu ve Bölge Bilgisi
+            <span className="tab-desktop-txt">Konumu ve Bölge Bilgisi</span>
+            <span className="tab-mobile-txt">Konum & Bölge</span>
           </button>
           <button
             className={`detail-tab-btn ${activeTab === 'index' ? 'active' : ''}`}
@@ -1787,7 +1794,8 @@ function DetailPage({
             role="tab"
             aria-selected={activeTab === 'index'}
           >
-            Emlak Endeksi
+            <span className="tab-desktop-txt">Emlak Endeksi</span>
+            <span className="tab-mobile-txt">Endeks</span>
           </button>
         </div>
 
